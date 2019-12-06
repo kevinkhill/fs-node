@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "strict": true,
+    "sourceMap": true,
+    "jsx": "preserve",
+    "target": "es6",
+    "module": "commonjs",
+    "importHelpers": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "dom"
+    ]
+  },
+  "include": [
+    "index.ts",
+    "src/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
