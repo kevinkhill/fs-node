@@ -8,12 +8,12 @@ const vault = new NcVault({
 
 (async vault => {
   vault.blacklist.ext = ["lnk", "debug"];
-  vault.cd("MISC");
+  // vault.cd("MISC");
 
   try {
-    const contents = await vault.getFiles();
+    const files = await vault.getFiles();
 
-    console.log(contents);
+    console.log(files);
 
     const index = await vault.getIndex();
 

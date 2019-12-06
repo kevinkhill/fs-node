@@ -16,11 +16,12 @@ export interface NcVaultOptions {
 
 export interface FsNode {
   abspath: string;
+  dir: string;
   ext: Maybe<string>;
-  name: string;
   isDirectory: boolean;
   isFile: boolean;
   mime: Maybe<string>;
-  path: string;
+  name: string;
   relpath: string;
+  getContents: Function;
 }
