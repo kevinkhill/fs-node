@@ -20,6 +20,7 @@ export interface FsNode {
   ext: Maybe<string>;
   isDirectory: boolean;
   isFile: boolean;
+  isImage: boolean;
   mime: Maybe<string>;
   name: string;
   relpath: string;

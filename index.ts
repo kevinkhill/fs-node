@@ -3,21 +3,20 @@ import path from "path";
 import NcVault from "./src";
 
 const vault = new NcVault({
-  root: path.resolve("C:/H+405 PROGRAM VAULT")
+  root: path.join(__dirname, "tests", "vault")
 });
 
 (async vault => {
-  vault.blacklist.ext = ["lnk", "debug"];
-  // vault.cd("MISC");
-
   try {
-    const files = await vault.getFiles();
+    const contents = await vault.ls();
 
-    console.log(files);
+    console.log(contents);
+
+    // console.log(await contents[1].getContents());
 
     const index = await vault.getIndex();
 
-    console.log(index.length);
+    console.log("file count", index.length);
   } catch (err) {
     console.error(err);
   }

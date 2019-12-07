@@ -1,19 +1,19 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "strict": true,
     "sourceMap": true,
-    "jsx": "preserve",
-    "target": "es6",
-    "module": "commonjs",
+    "target": "es5",
+    "alwaysStrict": true,
+    "module": "CommonJS",
+    "noImplicitAny": true,
     "importHelpers": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
     "lib": [
-      "dom"
+      "DOM",
+      "ES2018"
     ]
   },
   "include": [

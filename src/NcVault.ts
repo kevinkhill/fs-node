@@ -1,16 +1,16 @@
-// import * as fs from "async-file";
 import fs from "fs";
+import isImage from "is-image";
 import _ from "lodash/fp";
-import dir from "node-dir";
 import path from "path";
+import readdirp, { EntryInfo } from "readdirp";
 
 import * as lib from "./lib";
 import { FilterList, FsNode, NcVaultOptions } from "./types";
 
-export class NcVault {
-  static DEFAULT_ROOT = "C:\\PROGRAM VAULT";
+type NwRequire = (id: string) => any;
 
-  root = NcVault.DEFAULT_ROOT;
+export class NcVault {
+  root = "";
   cwd = ".";
 
   whitelist: FilterList = {
@@ -23,24 +23,23 @@ export class NcVault {
 
   index: string[] = [];
 
-  private _fs: typeof fs.promises;
-  private _dir: typeof dir;
   private _path: typeof path;
+  private _fs: typeof fs.promises;
+  private _readdirp: typeof readdirp;
 
   constructor(options?: NcVaultOptions) {
-    const windowExists = typeof window === "undefined";
+    const windowExists = typeof window !== "undefined";
 
-    if (windowExists) {
-      const nw = (window as any).nw;
-      const nwRequire = nw.require;
+    if (windowExists && "nw" in window) {
+      const nwRequire: NwRequire = _.get("nw.require", window);
 
-      this._fs = nwRequire("fs").promises;
       this._path = nwRequire("path");
-      this._dir = nwRequire("node-dir");
+      this._fs = nwRequire("fs").promises;
+      this._readdirp = nwRequire("readdirp");
     } else {
-      this._fs = fs.promises;
       this._path = path;
-      this._dir = dir;
+      this._fs = fs.promises;
+      this._readdirp = readdirp;
     }
 
     if (options && "root" in options) {
@@ -48,34 +47,64 @@ export class NcVault {
     }
 
     this.cd();
-    this.rebuildIndex();
   }
 
+  /**
+   * Set a new root directory for the vault
+   */
+  setRoot(rootPath: string): void {
+    this.root = this._path.resolve(this._path.normalize(rootPath));
+  }
+
+  /**
+   * Behaves the same way `cd` does, with `/` acting as `this.root`
+   */
   cd(path?: string): this {
-    this.cwd = path ? this.join(this.root, path) : this.root;
+    this.cwd = path ? this._path.join(this.root, path) : this.root;
 
     return this;
   }
 
-  setRoot(rootPath: string): void {
-    this.root = this.resolve(this.normalize(rootPath));
-  }
-
+  /**
+   * Get a listing of all the files from `this.root`
+   */
   async getIndex(): Promise<string[]> {
-    await this.rebuildIndex();
-
-    return this.index;
+    return _.map(file => file.path, await this.readdirp(this.root));
   }
 
+  /**
+   * Rescan the vault for files and populate the index
+   */
+  async rebuildIndex(): Promise<void> {
+    this.index = await this.getIndex();
+  }
+
+  /**
+   * Retrive a listing of all `FsNode` in `this.cwd`
+   *
+   * If `path` is given, then it will be used instead of `this.cwd`
+   */
   async ls(path?: string): Promise<FsNode[]> {
     return _.flow([
       _.map((dirent: fs.Dirent) => this.createFsNode(dirent)),
       _.reject((node: FsNode) =>
         _.includes(node.ext, this.blacklist.ext)
       )
-    ])(await this.readPath(path || this.cwd));
+    ])(await this.readdir(this._path.resolve(path || this.cwd)));
   }
 
+  /**
+   * Get a listing of all directory `FsNode` in `this.cwd`
+   */
+  async getDirs(path?: string): Promise<FsNode[]> {
+    return lib.noFiles(path ? await this.ls(path) : await this.ls());
+  }
+
+  /**
+   * Get a listing of all the file `FsNode` in `this.cwd`
+   *
+   * Use the `{ dotfiles }` option to reveal `.*` files if needed
+   */
   async getFiles(options = { dotfiles: false }): Promise<FsNode[]> {
     const files = lib.noDirs(await this.ls());
 
@@ -86,49 +115,35 @@ export class NcVault {
     return files;
   }
 
-  async getDirs(): Promise<FsNode[]> {
-    return lib.noFiles(await this.ls());
-  }
-
-  async rebuildIndex(): Promise<void> {
-    this.index = await this._dir.promiseFiles(this.root);
-  }
-
-  private readCwd(): Promise<fs.Dirent[]> {
-    return this.readPath(this.cwd);
-  }
-
-  private readPath(path: string): Promise<fs.Dirent[]> {
-    return fs.promises.readdir(path, {
+  /**
+   * Read a directory for files
+   */
+  private readdir(abspath: string): Promise<fs.Dirent[]> {
+    return fs.promises.readdir(abspath, {
       withFileTypes: true
     });
   }
 
-  private getAbspath(dirent: fs.Dirent): string {
-    return this.join(this.cwd, dirent.name);
+  /**
+   * Recusively read a directory for files
+   */
+  private readdirp(abspath: string): Promise<EntryInfo[]> {
+    return this._readdirp.promise(abspath);
   }
 
-  private normalize(path: string): string {
-    return this._path.normalize(path);
-  }
-
-  private resolve(...pathSegments: string[]): string {
-    return this._path.resolve(...pathSegments);
-  }
-
-  private join(...pathSegments: string[]): string {
-    return this._path.resolve(this._path.join(...pathSegments));
-  }
-
+  /**
+   * Create a new {@link FsNode} from a Dirent
+   */
   private createFsNode(dirent: fs.Dirent): FsNode {
     const isFile = dirent.isFile();
     const isDirectory = dirent.isDirectory();
-    const abspath = this.getAbspath(dirent);
+    const abspath = this._path.join(this.cwd, dirent.name);
 
     return {
       abspath,
       isFile,
       isDirectory,
+      isImage: isImage(abspath),
       name: dirent.name,
       ext: lib.getExt(dirent.name),
       mime: lib.getMime(dirent.name),
@@ -140,8 +155,7 @@ export class NcVault {
       getContents: async () => {
         return isFile
           ? (await this._fs.readFile(abspath)).toString()
-          : null;
-        // if (isDirectory) return this.ls(abspath);
+          : this.ls(abspath);
       }
     };
   }
