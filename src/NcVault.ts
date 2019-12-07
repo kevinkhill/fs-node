@@ -11,7 +11,7 @@ type NwRequire = (id: string) => any;
 
 export class NcVault {
   root = "";
-  cwd = ".";
+  cwd = "";
 
   whitelist: FilterList = {
     ext: ["nc", "mcam"]
@@ -53,16 +53,25 @@ export class NcVault {
    * Set a new root directory for the vault
    */
   setRoot(rootPath: string): void {
-    this.root = this._path.resolve(this._path.normalize(rootPath));
+    const { resolve, normalize } = this._path;
+
+    this.root = resolve(normalize(rootPath));
   }
 
   /**
    * Behaves the same way `cd` does, with `/` acting as `this.root`
    */
   cd(path?: string): this {
-    this.cwd = path ? this._path.join(this.root, path) : this.root;
+    this.cwd = path ? this.joinCwd(path) : "/";
 
     return this;
+  }
+
+  /**
+   * Return `this.cwd` as an absolute path
+   */
+  get absCwd(): string {
+    return this._path.join(this.root, this.cwd);
   }
 
   /**
@@ -80,24 +89,42 @@ export class NcVault {
   }
 
   /**
+   * Check if `this.cwd` has a "SETUP_INFO" folder inside
+   *
+   * If `path` is given, then it will be used instead of `this.cwd`
+   */
+  async hasSetupInfo(relpath?: string): Promise<boolean> {
+    return _.any(
+      (node: FsNode) => node.name === "SETUP_INFO",
+      await this.getDirs(relpath)
+    );
+  }
+
+  /**
    * Retrive a listing of all `FsNode` in `this.cwd`
    *
    * If `path` is given, then it will be used instead of `this.cwd`
    */
-  async ls(path?: string): Promise<FsNode[]> {
+  async getNodes(relpath?: string): Promise<FsNode[]> {
+    if (relpath) this.cd(relpath);
+
     return _.flow([
       _.map((dirent: fs.Dirent) => this.createFsNode(dirent)),
       _.reject((node: FsNode) =>
         _.includes(node.ext, this.blacklist.ext)
       )
-    ])(await this.readdir(this._path.resolve(path || this.cwd)));
+    ])(await this.readdir(this.absCwd));
   }
 
   /**
    * Get a listing of all directory `FsNode` in `this.cwd`
    */
-  async getDirs(path?: string): Promise<FsNode[]> {
-    return lib.noFiles(path ? await this.ls(path) : await this.ls());
+  async getDirs(relpath?: string): Promise<FsNode[]> {
+    if (relpath) {
+      this.cd(relpath);
+    }
+
+    return lib.noFiles(await this.getNodes());
   }
 
   /**
@@ -106,7 +133,7 @@ export class NcVault {
    * Use the `{ dotfiles }` option to reveal `.*` files if needed
    */
   async getFiles(options = { dotfiles: false }): Promise<FsNode[]> {
-    const files = lib.noDirs(await this.ls());
+    const files = lib.noDirs(await this.getNodes());
 
     if (options.dotfiles === false) {
       return lib.noDotfiles(files);
@@ -119,6 +146,10 @@ export class NcVault {
    * Read a directory for files
    */
   private readdir(abspath: string): Promise<fs.Dirent[]> {
+    if (!this._path.isAbsolute(abspath)) {
+      throw Error("this.readdir must be given an absolute path");
+    }
+
     return fs.promises.readdir(abspath, {
       withFileTypes: true
     });
@@ -128,7 +159,18 @@ export class NcVault {
    * Recusively read a directory for files
    */
   private readdirp(abspath: string): Promise<EntryInfo[]> {
+    if (!this._path.isAbsolute(abspath)) {
+      throw Error("this.readdirp must be given an absolute path");
+    }
+
     return this._readdirp.promise(abspath);
+  }
+
+  /**
+   * Build an absolute path from path pieces relative to `this.cwd`
+   */
+  private joinCwd(...paths: string[]): string {
+    return this._path.join(this.cwd, ...paths);
   }
 
   /**
@@ -137,7 +179,8 @@ export class NcVault {
   private createFsNode(dirent: fs.Dirent): FsNode {
     const isFile = dirent.isFile();
     const isDirectory = dirent.isDirectory();
-    const abspath = this._path.join(this.cwd, dirent.name);
+    const abspath = this.joinCwd(dirent.name);
+    const currentDir = _.last(this.cwd.split(this._path.sep));
 
     return {
       abspath,
@@ -146,7 +189,6 @@ export class NcVault {
       isImage: isImage(abspath),
       name: dirent.name,
       ext: lib.getExt(dirent.name),
-      mime: lib.getMime(dirent.name),
       relpath: this._path.join(
         this.cwd.replace(this.root, ""),
         dirent.name
@@ -155,7 +197,13 @@ export class NcVault {
       getContents: async () => {
         return isFile
           ? (await this._fs.readFile(abspath)).toString()
-          : this.ls(abspath);
+          : this.getNodes(abspath);
+      },
+      getParent: async () => {
+        return _.find(
+          (node: FsNode) => node.name === currentDir,
+          await this.getDirs("..")
+        );
       }
     };
   }

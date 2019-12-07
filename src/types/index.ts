@@ -21,8 +21,8 @@ export interface FsNode {
   isDirectory: boolean;
   isFile: boolean;
   isImage: boolean;
-  mime: Maybe<string>;
   name: string;
   relpath: string;
   getContents: Function;
+  getParent: Function;
 }
