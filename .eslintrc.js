@@ -19,8 +19,8 @@ module.exports = {
     Promise: true
   },
   plugins: [
-    "prettier",
     "import",
+    "prettier",
     "lodash-fp",
     "simple-import-sort",
     "@typescript-eslint"
