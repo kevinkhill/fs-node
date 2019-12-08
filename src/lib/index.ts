@@ -11,6 +11,10 @@ export const noDotfiles = _.reject((node: FsNode) =>
   node.name.startsWith(".")
 );
 
+export function isSetupNode(node: FsNode): boolean {
+  return node.name === "SETUP_INFO";
+}
+
 export function fwdSlash(path: string): string {
   console.log(path);
 

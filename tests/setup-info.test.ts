@@ -23,3 +23,15 @@ test("Check if a given relative path contains a 'SETUP_INFO' dir", async (done) 
 
   done();
 });
+
+test("Get a 'SETUP_INFO' dir", async (done) => {
+  vault.cd("misc")
+
+  expect(await vault.hasSetupInfo()).toBeTruthy();
+
+  const setupInfo = await vault.getSetupInfo();
+
+  expect(setupInfo.length).toBe(3);
+
+  done();
+});

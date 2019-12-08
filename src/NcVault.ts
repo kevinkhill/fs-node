@@ -5,7 +5,7 @@ import path from "path";
 import readdirp, { EntryInfo } from "readdirp";
 
 import * as lib from "./lib";
-import { FilterList, FsNode, NcVaultOptions } from "./types";
+import { FilterList, FsNode, Maybe, NcVaultOptions } from "./types";
 
 type NwRequire = (id: string) => any;
 
@@ -94,11 +94,31 @@ export class NcVault {
    * If `path` is given, then it will be used instead of `this.cwd`
    */
   async hasSetupInfo(relpath?: string): Promise<boolean> {
-    return _.any(
-      (node: FsNode) => node.name === "SETUP_INFO",
+    return _.any(lib.isSetupNode, await this.getDirs(relpath));
+  }
+
+  /**
+   * Get the "SETUP_INFO" dir from `this.cwd`
+   *
+   * If `path` is given, then it will be used instead of `this.cwd`
+   */
+  async getSetupInfo(relpath?: string): Promise<FsNode[]> {
+    const hasSetupInfo = _.any(
+      lib.isSetupNode,
       await this.getDirs(relpath)
     );
+
+    return hasSetupInfo ? this.getNodes("SETUP_INFO") : [];
   }
+
+  // async getSelf(): Promise<FsNode> {
+  //   const thisDir = _.last(this.cwd.split(this._path.sep));
+
+  //   return _.find(
+  //     (node: FsNode) => node.name === thisDir,
+  //     await this.getNodes("..")
+  //   ) as FsNode;
+  // }
 
   /**
    * Retrive a listing of all `FsNode` in `this.cwd`
@@ -167,7 +187,7 @@ export class NcVault {
   }
 
   /**
-   * Build an absolute path from path pieces relative to `this.cwd`
+   * Build a path from path pieces relative to `this.cwd`
    */
   private joinCwd(...paths: string[]): string {
     return this._path.join(this.cwd, ...paths);
@@ -179,27 +199,43 @@ export class NcVault {
   private createFsNode(dirent: fs.Dirent): FsNode {
     const isFile = dirent.isFile();
     const isDirectory = dirent.isDirectory();
-    const abspath = this.joinCwd(dirent.name);
+    const relpath = this._path.join(
+      this.cwd.replace(this.root, ""),
+      dirent.name
+    );
+    const abspath = this._path.join(
+      this.root,
+      this.joinCwd(dirent.name)
+    );
     const currentDir = _.last(this.cwd.split(this._path.sep));
 
     return {
       abspath,
+      relpath,
       isFile,
       isDirectory,
-      isImage: isImage(abspath),
       name: dirent.name,
+      isImage: isImage(abspath),
       ext: lib.getExt(dirent.name),
-      relpath: this._path.join(
-        this.cwd.replace(this.root, ""),
-        dirent.name
-      ),
       dir: this._path.resolve(abspath.replace(dirent.name, "")),
-      getContents: async () => {
+      getSetupInfo: async (): Promise<Maybe<FsNode[]>> => {
+        if (isDirectory) {
+          const hasSetupInfo = _.any(
+            lib.isSetupNode,
+            await this.getDirs(relpath)
+          );
+
+          if (hasSetupInfo) {
+            return this.getNodes("SETUP_INFO");
+          }
+        }
+      },
+      getContents: async (): Promise<string | FsNode | FsNode[]> => {
         return isFile
           ? (await this._fs.readFile(abspath)).toString()
           : this.getNodes(abspath);
       },
-      getParent: async () => {
+      getParent: async (): Promise<Maybe<FsNode>> => {
         return _.find(
           (node: FsNode) => node.name === currentDir,
           await this.getDirs("..")

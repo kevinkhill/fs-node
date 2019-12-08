@@ -23,6 +23,7 @@ export interface FsNode {
   isImage: boolean;
   name: string;
   relpath: string;
-  getContents: Function;
   getParent: Function;
+  getContents: Function;
+  getSetupInfo: Function;
 }
