@@ -13,7 +13,7 @@ beforeEach(() => {
 test('Scan vault.root and check file count', async (done) => {
   const index = await vault.getIndex();
 
-  expect(index.length).toBe(21);
+  expect(index.length).toBe(26);
 
   done();
 });

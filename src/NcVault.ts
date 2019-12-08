@@ -6,6 +6,7 @@ import readdirp, { EntryInfo } from "readdirp";
 
 import * as lib from "./lib";
 import { FilterList, FsNode, Maybe, NcVaultOptions } from "./types";
+import { GetFilesOptions } from "./types/index";
 
 type NwRequire = (id: string) => any;
 
@@ -152,11 +153,20 @@ export class NcVault {
    *
    * Use the `{ dotfiles }` option to reveal `.*` files if needed
    */
-  async getFiles(options = { dotfiles: false }): Promise<FsNode[]> {
+  async getFiles(
+    options: GetFilesOptions = { dotfiles: false }
+  ): Promise<FsNode[]> {
     const files = lib.noDirs(await this.getNodes());
 
     if (options.dotfiles === false) {
       return lib.noDotfiles(files);
+    }
+
+    if ("onlyExt" in options) {
+      return _.filter(
+        (node: FsNode) => node.ext === options.onlyExt,
+        files
+      );
     }
 
     return files;
@@ -230,7 +240,7 @@ export class NcVault {
           }
         }
       },
-      getContents: async (): Promise<string | FsNode | FsNode[]> => {
+      getContents: async (): Promise<string | FsNode[]> => {
         return isFile
           ? (await this._fs.readFile(abspath)).toString()
           : this.getNodes(abspath);

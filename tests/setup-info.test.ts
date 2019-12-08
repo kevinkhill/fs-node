@@ -11,7 +11,7 @@ beforeEach(() => {
 });
 
 test("Check if this.cwd contains a 'SETUP_INFO' dir", async (done) => {
-  vault.cd("category_2/part_D")
+  vault.cd("job_9/part_D")
 
   expect(await vault.hasSetupInfo()).toBeTruthy();
 
@@ -19,7 +19,7 @@ test("Check if this.cwd contains a 'SETUP_INFO' dir", async (done) => {
 });
 
 test("Check if a given relative path contains a 'SETUP_INFO' dir", async (done) => {
-  expect(await vault.hasSetupInfo("category_2/part_D")).toBeTruthy();
+  expect(await vault.hasSetupInfo("job_9/part_D")).toBeTruthy();
 
   done();
 });

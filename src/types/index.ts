@@ -2,6 +2,12 @@ export type Maybe<T> = T | undefined;
 
 export type FilterList = Partial<Record<string, string[]>>;
 
+export interface GetFilesOptions {
+  dotfiles?: boolean;
+  onlyExt?: string;
+  extWhitelist?: string[];
+}
+
 export interface NcVaultOptions {
   root: string;
   blacklist?: {
