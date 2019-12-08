@@ -1,8 +1,8 @@
 import path from "path";
 
-import NcVault from "./src";
+import ProgramVault from "./src";
 
-const vault = new NcVault({
+const vault = new ProgramVault({
   root: path.join(__dirname, "tests", "vault")
 });
 

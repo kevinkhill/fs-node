@@ -8,7 +8,7 @@ export interface GetFilesOptions {
   extWhitelist?: string[];
 }
 
-export interface NcVaultOptions {
+export interface VaultOptions {
   root: string;
   blacklist?: {
     ext?: string[];

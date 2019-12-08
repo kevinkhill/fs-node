@@ -1,3 +1,3 @@
-import { NcVault } from "./NcVault";
+import { ProgramVault } from "./ProgramVault";
 
-export default NcVault;
+export default ProgramVault;

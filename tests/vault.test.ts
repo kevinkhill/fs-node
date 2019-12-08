@@ -1,11 +1,11 @@
 import path from "path";
 
-import NcVault from "../src";
+import ProgramVault from "../src";
 
-let vault: NcVault;
+let vault: ProgramVault;
 
 beforeEach(() => {
-  vault = new NcVault({
+  vault = new ProgramVault({
     root: path.join(__dirname, "vault")
   });
 });
