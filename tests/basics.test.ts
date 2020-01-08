@@ -1,7 +1,7 @@
 import path from "path";
 import map from "lodash/fp/map";
 
-import ProgramVault from "../src";
+import { ProgramVault } from "../src";
 
 let vault: ProgramVault;
 
@@ -16,26 +16,16 @@ test("Count the files & folders in /sys_1", async (done) => {
 
   const dirs = await vault.getDirs();
   const files = await vault.getFiles();
+  const fileNames = map("name", dirs);
 
-  expect(dirs.length).toBe(2);
-  expect(map("name", dirs)).toContain("part_A");
-  expect(map("name", dirs)).toContain("part_B");
+  expect(dirs).toHaveLength(2);
+  expect(fileNames).toContain("part_A");
+  expect(fileNames).toContain("part_B");
 
-  expect(files.length).toBe(0);
+  expect(files).toHaveLength(0);
 
   done();
 });
-
-// test("Traverse back to parent from /job_9/part_E", async (done) => {
-//   // vault.cd();
-
-//   const dirs = await vault.getDirs("job_9/part_E");
-//   const parent = await dirs[0].getParent();
-
-//   expect(parent.name).toBe("job_9");
-
-//   done();
-// });
 
 test("Count the files & folders in /job_9/part_E", async (done) => {
   vault.cd("job_9/part_E");
@@ -43,8 +33,8 @@ test("Count the files & folders in /job_9/part_E", async (done) => {
   const dirs = await vault.getDirs();
   const files = await vault.getFiles();
 
-  expect(dirs.length).toBe(2);
-  expect(files.length).toBe(6);
+  expect(dirs).toHaveLength(0);
+  expect(files).toHaveLength(6);
 
   done();
 });

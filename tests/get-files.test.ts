@@ -1,6 +1,6 @@
 import path from "path";
 
-import ProgramVault from "../src";
+import { ProgramVault } from "../src";
 
 let vault: ProgramVault;
 

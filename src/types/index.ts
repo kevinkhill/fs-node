@@ -1,6 +1,7 @@
-export type Maybe<T> = T | undefined;
-
 export type FilterList = Partial<Record<string, string[]>>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type NwRequire = (id: string) => any;
 
 export interface GetFilesOptions {
   dotfiles?: boolean;
@@ -23,7 +24,7 @@ export interface VaultOptions {
 export interface FsNode {
   abspath: string;
   dir: string;
-  ext: Maybe<string>;
+  ext?: string;
   isDirectory: boolean;
   isFile: boolean;
   isImage: boolean;

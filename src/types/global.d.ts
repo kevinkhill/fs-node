@@ -1,7 +1,7 @@
 declare namespace global {
   interface Window {
     nw: {
-      require<T extends string>(id: T): import(T);
+      require<T>(id: T): T;
     };
   }
 }

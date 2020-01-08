@@ -1,18 +1,37 @@
 import fs from "fs";
 import isImage from "is-image";
-import _ from "lodash/fp";
+import {
+  any,
+  filter,
+  find,
+  flow,
+  get,
+  includes,
+  last,
+  map,
+  reject
+} from "lodash/fp";
 import path from "path";
 import readdirp, { EntryInfo } from "readdirp";
 
-import * as lib from "./lib";
-import { FilterList, FsNode, Maybe, VaultOptions } from "./types";
-import { GetFilesOptions } from "./types/index";
-
-type NwRequire = (id: string) => any;
+import {
+  getExt,
+  isSetupNode,
+  noDirs,
+  noDotfiles,
+  noFiles
+} from "./lib";
+import {
+  FilterList,
+  FsNode,
+  GetFilesOptions,
+  NwRequire,
+  VaultOptions
+} from "./types";
 
 export class ProgramVault {
   root = "";
-  cwd = "";
+  currentDir = "/";
 
   whitelist: FilterList = {
     ext: ["nc", "mcam"]
@@ -28,11 +47,18 @@ export class ProgramVault {
   private _fs: typeof fs.promises;
   private _readdirp: typeof readdirp;
 
+  /**
+   * Return `this.cwd` as an absolute path
+   */
+  get cwd(): string {
+    return this.joinRoot(this.currentDir);
+  }
+
   constructor(options?: VaultOptions) {
     const windowExists = typeof window !== "undefined";
 
     if (windowExists && "nw" in window) {
-      const nwRequire: NwRequire = _.get("nw.require", window);
+      const nwRequire: NwRequire = get("nw.require", window);
 
       this._path = nwRequire("path");
       this._fs = nwRequire("fs").promises;
@@ -46,8 +72,6 @@ export class ProgramVault {
     if (options && "root" in options) {
       this.setRoot(options.root);
     }
-
-    this.cd();
   }
 
   /**
@@ -62,24 +86,21 @@ export class ProgramVault {
   /**
    * Behaves the same way `cd` does, with `/` acting as `this.root`
    */
-  cd(path?: string): this {
-    this.cwd = path ? this.joinCwd(path) : "/";
+  cd(fspath = "/"): this {
+    if (fspath.startsWith("/")) {
+      this.currentDir = fspath;
+    } else {
+      this.currentDir = this._path.join(this.currentDir, fspath);
+    }
 
     return this;
-  }
-
-  /**
-   * Return `this.cwd` as an absolute path
-   */
-  get absCwd(): string {
-    return this._path.join(this.root, this.cwd);
   }
 
   /**
    * Get a listing of all the files from `this.root`
    */
   async getIndex(): Promise<string[]> {
-    return _.map(file => file.path, await this.readdirp(this.root));
+    return map(file => file.path, await this.readdirp(this.root));
   }
 
   /**
@@ -95,7 +116,7 @@ export class ProgramVault {
    * If `path` is given, then it will be used instead of `this.cwd`
    */
   async hasSetupInfo(relpath?: string): Promise<boolean> {
-    return _.any(lib.isSetupNode, await this.getDirs(relpath));
+    return any(isSetupNode, await this.getDirs(relpath));
   }
 
   /**
@@ -104,20 +125,19 @@ export class ProgramVault {
    * If `path` is given, then it will be used instead of `this.cwd`
    */
   async getSetupInfo(relpath?: string): Promise<FsNode[]> {
-    const hasSetupInfo = _.any(
-      lib.isSetupNode,
-      await this.getDirs(relpath)
-    );
+    if (relpath) this.cd(relpath);
 
-    return hasSetupInfo ? this.getNodes("SETUP_INFO") : [];
+    return (await this.hasSetupInfo())
+      ? this.getContents("SETUP_INFO")
+      : [];
   }
 
   // async getSelf(): Promise<FsNode> {
-  //   const thisDir = _.last(this.cwd.split(this._path.sep));
+  //   const thisDir = last(this.cwd.split(this._path.sep));
 
-  //   return _.find(
+  //   return find(
   //     (node: FsNode) => node.name === thisDir,
-  //     await this.getNodes("..")
+  //     await this.getContents("..")
   //   ) as FsNode;
   // }
 
@@ -126,26 +146,22 @@ export class ProgramVault {
    *
    * If `path` is given, then it will be used instead of `this.cwd`
    */
-  async getNodes(relpath?: string): Promise<FsNode[]> {
+  async getContents(relpath?: string): Promise<FsNode[]> {
     if (relpath) this.cd(relpath);
 
-    return _.flow([
-      _.map((dirent: fs.Dirent) => this.createFsNode(dirent)),
-      _.reject((node: FsNode) =>
-        _.includes(node.ext, this.blacklist.ext)
-      )
-    ])(await this.readdir(this.absCwd));
+    return flow([
+      map((dirent: fs.Dirent) => this.createFsNode(dirent)),
+      reject((node: FsNode) => includes(node.ext, this.blacklist.ext))
+    ])(await this.readdir(this.cwd));
   }
 
   /**
    * Get a listing of all directory `FsNode` in `this.cwd`
    */
   async getDirs(relpath?: string): Promise<FsNode[]> {
-    if (relpath) {
-      this.cd(relpath);
-    }
+    if (relpath) this.cd(relpath);
 
-    return lib.noFiles(await this.getNodes());
+    return noFiles(await this.getContents());
   }
 
   /**
@@ -156,14 +172,14 @@ export class ProgramVault {
   async getFiles(
     options: GetFilesOptions = { dotfiles: false }
   ): Promise<FsNode[]> {
-    const files = lib.noDirs(await this.getNodes());
+    const files = noDirs(await this.getContents());
 
     if (options.dotfiles === false) {
-      return lib.noDotfiles(files);
+      return noDotfiles(files);
     }
 
     if ("onlyExt" in options) {
-      return _.filter(
+      return filter(
         (node: FsNode) => node.ext === options.onlyExt,
         files
       );
@@ -197,9 +213,16 @@ export class ProgramVault {
   }
 
   /**
+   * Build a path from path pieces relative to `this.root`
+   */
+  private joinRoot(abspath: string): string {
+    return this._path.join(this.root, abspath.replace(/^\//, ""));
+  }
+
+  /**
    * Build a path from path pieces relative to `this.cwd`
    */
-  private joinCwd(...paths: string[]): string {
+  private joinPath(...paths: string[]): string {
     return this._path.join(this.cwd, ...paths);
   }
 
@@ -215,9 +238,9 @@ export class ProgramVault {
     );
     const abspath = this._path.join(
       this.root,
-      this.joinCwd(dirent.name)
+      this.joinPath(dirent.name)
     );
-    const currentDir = _.last(this.cwd.split(this._path.sep));
+    const currentDir = last(this.cwd.split(this._path.sep));
 
     return {
       abspath,
@@ -226,27 +249,27 @@ export class ProgramVault {
       isDirectory,
       name: dirent.name,
       isImage: isImage(abspath),
-      ext: lib.getExt(dirent.name),
+      ext: getExt(dirent.name),
       dir: this._path.resolve(abspath.replace(dirent.name, "")),
-      getSetupInfo: async (): Promise<Maybe<FsNode[]>> => {
+      getSetupInfo: async (): Promise<FsNode[] | undefined> => {
         if (isDirectory) {
-          const hasSetupInfo = _.any(
-            lib.isSetupNode,
+          const hasSetupInfo = any(
+            isSetupNode,
             await this.getDirs(relpath)
           );
 
           if (hasSetupInfo) {
-            return this.getNodes("SETUP_INFO");
+            return this.getContents("SETUP_INFO");
           }
         }
       },
       getContents: async (): Promise<string | FsNode[]> => {
         return isFile
           ? (await this._fs.readFile(abspath)).toString()
-          : this.getNodes(abspath);
+          : this.getContents(abspath);
       },
-      getParent: async (): Promise<Maybe<FsNode>> => {
-        return _.find(
+      getParent: async (): Promise<FsNode | undefined> => {
+        return find(
           (node: FsNode) => node.name === currentDir,
           await this.getDirs("..")
         );

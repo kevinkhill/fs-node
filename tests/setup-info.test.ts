@@ -1,6 +1,6 @@
 import path from "path";
 
-import ProgramVault from "../src";
+import { ProgramVault } from "../src";
 
 let vault: ProgramVault;
 
@@ -11,7 +11,7 @@ beforeEach(() => {
 });
 
 test("Check if this.cwd contains a 'SETUP_INFO' dir", async (done) => {
-  vault.cd("job_9/part_D")
+  vault.cd("job_9/part_D");
 
   expect(await vault.hasSetupInfo()).toBeTruthy();
 
@@ -25,13 +25,13 @@ test("Check if a given relative path contains a 'SETUP_INFO' dir", async (done) 
 });
 
 test("Get a 'SETUP_INFO' dir", async (done) => {
-  vault.cd("misc")
+  vault.cd("misc");
 
   expect(await vault.hasSetupInfo()).toBeTruthy();
 
   const setupInfo = await vault.getSetupInfo();
 
-  expect(setupInfo.length).toBe(3);
+  expect(setupInfo).toHaveLength(3);
 
   done();
 });
