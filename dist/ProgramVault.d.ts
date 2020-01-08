@@ -1,13 +1,17 @@
 import { FilterList, FsNode, GetFilesOptions, VaultOptions } from "./types";
 export declare class ProgramVault {
     root: string;
-    cwd: string;
+    currentDir: string;
     whitelist: FilterList;
     blacklist: FilterList;
     index: string[];
     private _path;
     private _fs;
     private _readdirp;
+    /**
+     * Return `this.cwd` as an absolute path
+     */
+    get cwd(): string;
     constructor(options?: VaultOptions);
     /**
      * Set a new root directory for the vault
@@ -16,11 +20,7 @@ export declare class ProgramVault {
     /**
      * Behaves the same way `cd` does, with `/` acting as `this.root`
      */
-    cd(path?: string): this;
-    /**
-     * Return `this.cwd` as an absolute path
-     */
-    get absCwd(): string;
+    cd(fspath?: string): this;
     /**
      * Get a listing of all the files from `this.root`
      */
@@ -66,9 +66,13 @@ export declare class ProgramVault {
      */
     private readdirp;
     /**
+     * Build a path from path pieces relative to `this.root`
+     */
+    private joinRoot;
+    /**
      * Build a path from path pieces relative to `this.cwd`
      */
-    private joinCwd;
+    private joinPath;
     /**
      * Create a new {@link FsNode} from a Dirent
      */

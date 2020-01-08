@@ -91,7 +91,7 @@ function () {
     _classCallCheck(this, ProgramVault);
 
     this.root = "";
-    this.cwd = "";
+    this.currentDir = "/";
     this.whitelist = {
       ext: ["nc", "mcam"]
     };
@@ -115,16 +115,18 @@ function () {
     if (options && "root" in options) {
       this.setRoot(options.root);
     }
-
-    this.cd();
   }
   /**
-   * Set a new root directory for the vault
+   * Return `this.cwd` as an absolute path
    */
 
 
   _createClass(ProgramVault, [{
     key: "setRoot",
+
+    /**
+     * Set a new root directory for the vault
+     */
     value: function setRoot(rootPath) {
       var _this$_path = this._path,
           resolve = _this$_path.resolve,
@@ -137,20 +139,23 @@ function () {
 
   }, {
     key: "cd",
-    value: function cd(path) {
-      this.cwd = path ? this.joinCwd(path) : "/";
+    value: function cd() {
+      var fspath = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "/";
+
+      if (fspath.startsWith("/")) {
+        this.currentDir = fspath;
+      } else {
+        this.currentDir = this._path.join(this.currentDir, fspath);
+      }
+
       return this;
     }
     /**
-     * Return `this.cwd` as an absolute path
+     * Get a listing of all the files from `this.root`
      */
 
   }, {
     key: "getIndex",
-
-    /**
-     * Get a listing of all the files from `this.root`
-     */
     value: function getIndex() {
       try {
         var _this2 = this;
@@ -212,9 +217,9 @@ function () {
       try {
         var _this8 = this;
 
-        return _await(_this8.getDirs(relpath), function (_this7$getDirs) {
-          var hasSetupInfo = fp.any(isSetupNode, _this7$getDirs);
-          return hasSetupInfo ? _this8.getContents("SETUP_INFO") : [];
+        if (relpath) _this8.cd(relpath);
+        return _await(_this8.hasSetupInfo(), function (_this7$hasSetupInfo) {
+          return _this7$hasSetupInfo ? _this8.getContents("SETUP_INFO") : [];
         });
       } catch (e) {
         return Promise.reject(e);
@@ -247,7 +252,7 @@ function () {
           return fp.includes(node.ext, _this10.blacklist.ext);
         })]);
 
-        return _await(_this10.readdir(_this10.absCwd), _flow2);
+        return _await(_this10.readdir(_this10.cwd), _flow2);
       } catch (e) {
         return Promise.reject(e);
       }
@@ -262,10 +267,7 @@ function () {
       try {
         var _this12 = this;
 
-        if (relpath) {
-          _this12.cd(relpath);
-        }
-
+        if (relpath) _this12.cd(relpath);
         return _await(_this12.getContents(), noFiles);
       } catch (e) {
         return Promise.reject(e);
@@ -326,12 +328,21 @@ function () {
       return this._readdirp.promise(abspath);
     }
     /**
+     * Build a path from path pieces relative to `this.root`
+     */
+
+  }, {
+    key: "joinRoot",
+    value: function joinRoot(abspath) {
+      return this._path.join(this.root, abspath.replace(/^\//, ""));
+    }
+    /**
      * Build a path from path pieces relative to `this.cwd`
      */
 
   }, {
-    key: "joinCwd",
-    value: function joinCwd() {
+    key: "joinPath",
+    value: function joinPath() {
       var _this$_path2;
 
       for (var _len = arguments.length, paths = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -356,7 +367,7 @@ function () {
 
       var relpath = this._path.join(this.cwd.replace(this.root, ""), dirent.name);
 
-      var abspath = this._path.join(this.root, this.joinCwd(dirent.name));
+      var abspath = this._path.join(this.root, this.joinPath(dirent.name));
 
       var currentDir = fp.last(this.cwd.split(this._path.sep));
       return {
@@ -396,9 +407,9 @@ function () {
       };
     }
   }, {
-    key: "absCwd",
+    key: "cwd",
     get: function get() {
-      return this._path.join(this.root, this.cwd);
+      return this.joinRoot(this.currentDir);
     }
   }]);
 
