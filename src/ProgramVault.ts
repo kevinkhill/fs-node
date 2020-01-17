@@ -255,7 +255,7 @@ export class ProgramVault {
         if (isDirectory) {
           const hasSetupInfo = any(
             isSetupNode,
-            await this.getDirs(relpath)
+            await this.getDirs(abspath)
           );
 
           if (hasSetupInfo) {
