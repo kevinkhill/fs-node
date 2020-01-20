@@ -1,4 +1,4 @@
-import { filter, reject } from "lodash/fp";
+import { any, filter, find, reject } from "lodash/fp";
 
 import { FsNode } from "../types";
 
@@ -28,3 +28,35 @@ export function getExt(filename: string): string | undefined {
     return parts[parts.length - 1];
   }
 }
+
+export async function getSetupInfo(node: FsNode): Promise<FsNode[]> {
+  if (node.isDirectory) {
+    const hasSetupInfo = any(
+      isSetupNode,
+      await this.getDirs(node.abspath)
+    );
+
+    if (hasSetupInfo) {
+      return this.getContents("SETUP_INFO");
+    }
+
+    return [];
+  }
+}
+
+export async function getContents(
+  node: FsNode
+): Promise<string | FsNode[]> {
+  return node.isFile
+    ? (await this._fs.readFile(node.abspath)).toString()
+    : this.getContents(node.abspath);
+}
+
+// export async function getParent(
+//   node: FsNode
+// ): Promise<FsNode | undefined> {
+//   return find(
+//     (node: FsNode) => node.name === currentDir,
+//     await this.getDirs("..")
+//   );
+// }

@@ -55,9 +55,7 @@ export class ProgramVault {
   }
 
   constructor(options?: VaultOptions) {
-    const windowExists = typeof window !== "undefined";
-
-    if (windowExists && "nw" in window) {
+    if (typeof window !== "undefined" && "nw" in window) {
       const nwRequire: NwRequire = get("nw.require", window);
 
       this._path = nwRequire("path");
@@ -97,6 +95,22 @@ export class ProgramVault {
   }
 
   /**
+   * Retrive a listing of all `FsNode` in `this.cwd`
+   *
+   * If `path` is given, then it will be used instead of `this.cwd`
+   */
+  async ls(relpath?: string): Promise<FsNode[]> {
+    if (relpath) this.cd(relpath);
+
+    return Promise.all(
+      map(
+        (abspath: string) => this.createFsNode(abspath),
+        await this.readdir(this.cwd)
+      )
+    );
+  }
+
+  /**
    * Get a listing of all the files from `this.root`
    */
   async getIndex(): Promise<string[]> {
@@ -132,14 +146,14 @@ export class ProgramVault {
       : [];
   }
 
-  // async getSelf(): Promise<FsNode> {
-  //   const thisDir = last(this.cwd.split(this._path.sep));
+  async getSelf(): Promise<FsNode> {
+    const thisDir = last(this.cwd.split(this._path.sep));
 
-  //   return find(
-  //     (node: FsNode) => node.name === thisDir,
-  //     await this.getContents("..")
-  //   ) as FsNode;
-  // }
+    return find(
+      (node: FsNode) => node.name === thisDir,
+      await this.getContents("..")
+    );
+  }
 
   /**
    * Retrive a listing of all `FsNode` in `this.cwd`
@@ -152,7 +166,7 @@ export class ProgramVault {
     return flow([
       map((dirent: fs.Dirent) => this.createFsNode(dirent)),
       reject((node: FsNode) => includes(node.ext, this.blacklist.ext))
-    ])(await this.readdir(this.cwd));
+    ])(await this.ls());
   }
 
   /**
@@ -191,12 +205,29 @@ export class ProgramVault {
   /**
    * Read a directory for files
    */
-  private readdir(abspath: string): Promise<fs.Dirent[]> {
+  private async readdir(abspath: string): Promise<string[]> {
     if (!this._path.isAbsolute(abspath)) {
-      throw Error("this.readdir must be given an absolute path");
+      throw Error("readdir must be given an absolute path");
     }
 
-    return fs.promises.readdir(abspath, {
+    const contents = map(entry => {
+      return this.joinRoot(this.currentDir, entry);
+    }, await this._fs.readdir(abspath));
+
+    console.log(contents);
+
+    return contents;
+  }
+
+  /**
+   * Read a directory for files
+   */
+  private _readdir(abspath: string): Promise<fs.Dirent[]> {
+    if (!this._path.isAbsolute(abspath)) {
+      throw Error("readdir must be given an absolute path");
+    }
+
+    return this._fs.readdir(abspath, {
       withFileTypes: true
     });
   }
@@ -215,65 +246,63 @@ export class ProgramVault {
   /**
    * Build a path from path pieces relative to `this.root`
    */
-  private joinRoot(abspath: string): string {
-    return this._path.join(this.root, abspath.replace(/^\//, ""));
+  private joinRoot(...paths: string[]): string {
+    return this._path.join(this.root, ...paths);
   }
 
   /**
    * Build a path from path pieces relative to `this.cwd`
    */
-  private joinPath(...paths: string[]): string {
+  private joinCwd(...paths: string[]): string {
     return this._path.join(this.cwd, ...paths);
   }
 
   /**
    * Create a new {@link FsNode} from a Dirent
    */
-  private createFsNode(dirent: fs.Dirent): FsNode {
-    const isFile = dirent.isFile();
-    const isDirectory = dirent.isDirectory();
-    const relpath = this._path.join(
-      this.cwd.replace(this.root, ""),
-      dirent.name
-    );
-    const abspath = this._path.join(
-      this.root,
-      this.joinPath(dirent.name)
-    );
-    const currentDir = last(this.cwd.split(this._path.sep));
+  private async createFsNode(abspath: string): Promise<FsNode> {
+    if (!this._path.isAbsolute(abspath)) {
+      throw Error("createFsNode() must be given an absolute path");
+    }
+
+    const stats = await this._fs.lstat(abspath);
+    const isFile = stats.isFile();
+    const isDirectory = stats.isDirectory();
+    // const abspath = this.joinRoot(this.currentDir, dirent.name);
+    const relpath = abspath.replace(this.root, "");
+
+    const name = abspath.split(this._path.sep).pop();
 
     return {
-      abspath,
+      name,
+      ext: getExt(name),
+      dir: last(this.cwd.split(this._path.sep)),
       relpath,
+      abspath,
       isFile,
       isDirectory,
-      name: dirent.name,
-      isImage: isImage(abspath),
-      ext: getExt(dirent.name),
-      dir: this._path.resolve(abspath.replace(dirent.name, "")),
-      getSetupInfo: async (): Promise<FsNode[] | undefined> => {
-        if (isDirectory) {
-          const hasSetupInfo = any(
-            isSetupNode,
-            await this.getDirs(abspath)
-          );
+      isImage: isImage(abspath)
+    };
+  }
 
-          if (hasSetupInfo) {
-            return this.getContents("SETUP_INFO");
-          }
-        }
-      },
-      getContents: async (): Promise<string | FsNode[]> => {
-        return isFile
-          ? (await this._fs.readFile(abspath)).toString()
-          : this.getContents(abspath);
-      },
-      getParent: async (): Promise<FsNode | undefined> => {
-        return find(
-          (node: FsNode) => node.name === currentDir,
-          await this.getDirs("..")
-        );
-      }
+  /**
+   * Create a new {@link FsNode} from a Dirent
+   */
+  private _createFsNode(dirent: fs.Dirent): FsNode {
+    const isFile = dirent.isFile();
+    const isDirectory = dirent.isDirectory();
+    const abspath = this.joinRoot(this.currentDir, dirent.name);
+    const relpath = abspath.replace(this.root, "");
+
+    return {
+      name: dirent.name,
+      ext: getExt(dirent.name),
+      dir: last(this.cwd.split(this._path.sep)),
+      relpath,
+      abspath,
+      isFile,
+      isDirectory,
+      isImage: isImage(abspath)
     };
   }
 }

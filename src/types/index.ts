@@ -22,15 +22,12 @@ export interface VaultOptions {
 }
 
 export interface FsNode {
-  abspath: string;
-  dir: string;
+  name: string;
   ext?: string;
-  isDirectory: boolean;
+  dir: string;
+  abspath: string;
+  relpath: string;
   isFile: boolean;
   isImage: boolean;
-  name: string;
-  relpath: string;
-  getParent: Function;
-  getContents: Function;
-  getSetupInfo: Function;
+  isDirectory: boolean;
 }

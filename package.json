@@ -10,7 +10,8 @@
   "dependencies": {
     "is-image": "^3.0.0",
     "lodash": "^4.17.15",
-    "readdirp": "^3.3.0"
+    "readdirp": "^3.3.0",
+    "ts-node": "^8.6.2"
   },
   "scripts": {
     "build": "bili",
@@ -41,6 +42,6 @@
     "prettier": "^1.19.1",
     "rollup-plugin-typescript2": "^0.25.3",
     "ts-jest": "^24.2.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   }
 }
