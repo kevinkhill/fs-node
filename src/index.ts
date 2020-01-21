@@ -1,4 +1,4 @@
-import { ProgramVault } from "./ProgramVault";
+import { FsVault } from "./FsVault";
 import { FsNode, VaultOptions } from "./types";
 
-export { ProgramVault, FsNode, VaultOptions };
+export { FsVault, FsNode, VaultOptions };

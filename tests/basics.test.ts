@@ -1,24 +1,22 @@
 import path from "path";
 import map from "lodash/fp/map";
 
-import { ProgramVault } from "../src";
+import { FsVault } from "../src";
+import { vault, getFiles, getDirs } from "../src/fp";
+import { mapName } from "../src/lib";
 
-let vault: ProgramVault;
+let testVault: FsVault;
 
 beforeEach(() => {
-  vault = new ProgramVault({
-    root: path.join(__dirname, "vault")
-  });
+  testVault = vault(path.join(__dirname, "vault"));
 });
 
-test("Count the files & folders in /sys_1", async (done) => {
-  vault.cd("sys_1");
+test("Count the files in /sys_1", async (done) => {
+  const files = await getFiles(testVault, "sys_1");
 
-  const dirs = await vault.getDirs();
-  const files = await vault.getFiles();
-  const fileNames = map("name", dirs);
+  console.log(files);
+  const fileNames = mapName(files);
 
-  expect(dirs).toHaveLength(2);
   expect(fileNames).toContain("part_A");
   expect(fileNames).toContain("part_B");
 
@@ -27,14 +25,26 @@ test("Count the files & folders in /sys_1", async (done) => {
   done();
 });
 
-test("Count the files & folders in /job_9/part_E", async (done) => {
-  vault.cd("job_9/part_E");
+test("Count the folders in /sys_1", async (done) => {
+  const dirs = await getDirs(testVault, "sys_1");
 
-  const dirs = await vault.getDirs();
-  const files = await vault.getFiles();
+  expect(dirs).toHaveLength(2);
+
+  done();
+});
+
+test("Count the files /job_9/part_E", async (done) => {
+  const files = await getFiles(testVault, "job_9/part_E");
+
+  expect(files).toHaveLength(6);
+
+  done();
+});
+
+test("Count the folders in /job_9/part_E", async (done) => {
+  const dirs = await getDirs(testVault, "job_9/part_E");
 
   expect(dirs).toHaveLength(0);
-  expect(files).toHaveLength(6);
 
   done();
 });

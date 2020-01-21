@@ -78,11 +78,11 @@ function _async(f) {
   };
 }
 
-var ProgramVault =
+var FsVault =
 /*#__PURE__*/
 function () {
-  function ProgramVault(options) {
-    _classCallCheck(this, ProgramVault);
+  function FsVault(options) {
+    _classCallCheck(this, FsVault);
 
     this.root = "";
     this.currentDir = "/";
@@ -115,7 +115,7 @@ function () {
    */
 
 
-  _createClass(ProgramVault, [{
+  _createClass(FsVault, [{
     key: "setRoot",
 
     /**
@@ -407,7 +407,7 @@ function () {
     }
   }]);
 
-  return ProgramVault;
+  return FsVault;
 }();
 
-export { ProgramVault };
+export { FsVault };

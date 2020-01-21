@@ -1,11 +1,11 @@
 import path from "path";
 
-import { ProgramVault } from "../src";
+import { FsVault } from "../src";
 
-let vault: ProgramVault;
+let vault: FsVault;
 
 beforeEach(() => {
-  vault = new ProgramVault({
+  vault = new FsVault({
     root: path.join(__dirname, "vault")
   });
 });

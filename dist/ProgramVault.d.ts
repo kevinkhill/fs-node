@@ -1,5 +1,5 @@
 import { FilterList, FsNode, GetFilesOptions, VaultOptions } from "./types";
-export declare class ProgramVault {
+export declare class FsVault {
     root: string;
     currentDir: string;
     whitelist: FilterList;

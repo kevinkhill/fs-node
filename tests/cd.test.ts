@@ -1,12 +1,12 @@
 import path from "path";
 import map from "lodash/fp/map";
 
-import { ProgramVault } from "../src";
+import { FsVault } from "../src";
 
-let vault: ProgramVault;
+let vault: FsVault;
 
 beforeEach(() => {
-  vault = new ProgramVault({
+  vault = new FsVault({
     root: path.join(__dirname, "vault")
   });
 });
