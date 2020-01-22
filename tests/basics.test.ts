@@ -1,9 +1,8 @@
 import path from "path";
-import map from "lodash/fp/map";
+import { get, map } from "lodash/fp";
 
 import { FsVault } from "../src";
 import { vault, getFiles, getDirs } from "../src/fp";
-import { mapName } from "../src/lib";
 
 let testVault: FsVault;
 
@@ -11,16 +10,14 @@ beforeEach(() => {
   testVault = vault(path.join(__dirname, "vault"));
 });
 
-test("Count the files in /sys_1", async (done) => {
-  const files = await getFiles(testVault, "sys_1");
+test("Count the files in /misc", async (done) => {
+  const files = await getFiles(testVault, "misc");
 
-  console.log(files);
-  const fileNames = mapName(files);
+  expect(files).toHaveLength(1);
 
-  expect(fileNames).toContain("part_A");
-  expect(fileNames).toContain("part_B");
+  const fileNames = map(get("name"), files);
 
-  expect(files).toHaveLength(0);
+  expect(fileNames).toContain("test_1.nc");
 
   done();
 });
@@ -44,7 +41,7 @@ test("Count the files /job_9/part_E", async (done) => {
 test("Count the folders in /job_9/part_E", async (done) => {
   const dirs = await getDirs(testVault, "job_9/part_E");
 
-  expect(dirs).toHaveLength(0);
+  expect(dirs).toHaveLength(2);
 
   done();
 });

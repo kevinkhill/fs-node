@@ -1,10 +1,9 @@
 import fs from "fs";
 import { clone, find, get, map } from "lodash/fp";
 import path from "path";
-import readdirp, { EntryInfo } from "readdirp";
+import readdirp from "readdirp";
 
-import { getDirs, ls } from "./fp";
-import { hasSetupNode, mapPath } from "./lib";
+import { hasSetupNode } from "./lib";
 import { FilterList, FsNode, NwRequire, VaultOptions } from "./types";
 
 export class FsVault {
@@ -21,9 +20,6 @@ export class FsVault {
 
   index: string[] = [];
   contents: FsNode[] = [];
-  options: {
-    dotfiles: false;
-  };
 
   private _path: typeof path;
   private _fs: typeof fs.promises;
@@ -66,52 +62,6 @@ export class FsVault {
     }
   }
 
-  split(filepath: string): string[] {
-    return filepath.split(this._path.sep);
-  }
-
-  /**
-   * Clones the vault at the given relative path
-   */
-  chroot(relpath?: string): FsVault {
-    const vault = FsVault.create(this.cwd);
-
-    vault.cd(relpath);
-
-    return vault;
-  }
-
-  isAbsPath(filepath: string): boolean {
-    return this._path.isAbsolute(filepath);
-  }
-
-  /**
-   * Set a new root directory for the vault
-   */
-  setRoot(rootPath: string): void {
-    const { resolve, normalize } = this._path;
-
-    this.root = resolve(normalize(rootPath));
-  }
-
-  getStats(filepath: string): Promise<any> {
-    return this._fs.lstat(filepath);
-  }
-
-  /**
-   * Get a listing of all the files from `this.root`
-   */
-  async getIndex(): Promise<string[]> {
-    return mapPath(await this.readdirp(this.root));
-  }
-
-  /**
-   * Rescan the vault for files and populate the index
-   */
-  async rebuildIndex(): Promise<void> {
-    this.index = await this.getIndex();
-  }
-
   /**
    * Behaves the same way `cd` does, with `/` acting as `this.root`
    */
@@ -128,10 +78,87 @@ export class FsVault {
   }
 
   /**
+   * Split a path into its pieces
+   */
+  split(filepath: string): string[] {
+    return filepath.split(this._path.sep);
+  }
+
+  /**
+   * Clones the vault at the given relative path
+   */
+  clone(relpath?: string): FsVault {
+    const vault = FsVault.create(this.cwd);
+
+    vault.cd(relpath);
+
+    return vault;
+  }
+
+  /**
+   * Check if the given path is an absolute path
+   */
+  isAbsPath(filepath: string): boolean {
+    return this._path.isAbsolute(filepath);
+  }
+
+  /**
+   * Set a new root directory for the vault
+   */
+  setRoot(rootPath: string): void {
+    const { resolve, normalize } = this._path;
+
+    this.root = resolve(normalize(rootPath));
+  }
+
+  /**
+   * Get the stats for a file
+   */
+  getStats(filepath: string): Promise<fs.Stats> {
+    return this._fs.lstat(filepath);
+  }
+
+  /**
+   * Get a listing of all the files from `this.root`
+   */
+  async getIndex(): Promise<string[]> {
+    return this.readdirp(this.root);
+  }
+
+  /**
+   * Rescan the vault for files and populate the index
+   */
+  async rebuildIndex(): Promise<void> {
+    this.index = await this.getIndex();
+  }
+
+  /**
+   * Build a path from path pieces relative to `this.root`
+   */
+  public joinRoot(...paths: string[]): string {
+    return this._path.join(this.root, ...paths);
+  }
+
+  /**
+   * Read a directory for files
+   */
+  public async readFile(abspath: string): Promise<string> {
+    if (!this.isAbsPath(abspath)) {
+      throw Error("readdir must be given an absolute path");
+    }
+
+    const contents = (await this._fs.readFile(abspath)).toString();
+
+    // console.log(contents);
+
+    return contents;
+  }
+
+  /**
    * Read a directory for files
    */
   public async readdir(abspath: string): Promise<string[]> {
-    if (!this._path.isAbsolute(abspath)) {
+    if (!this.isAbsPath(abspath)) {
       throw Error("readdir must be given an absolute path");
     }
 
@@ -147,25 +174,11 @@ export class FsVault {
   /**
    * Recusively read a directory for files
    */
-  private readdirp(abspath: string): Promise<EntryInfo[]> {
-    if (!this._path.isAbsolute(abspath)) {
+  private async readdirp(abspath: string): Promise<string[]> {
+    if (!this.isAbsPath(abspath)) {
       throw Error("readdirp must be given an absolute path");
     }
 
-    return this._readdirp.promise(abspath);
-  }
-
-  /**
-   * Build a path from path pieces relative to `this.root`
-   */
-  private joinRoot(...paths: string[]): string {
-    return this._path.join(this.root, ...paths);
-  }
-
-  /**
-   * Build a path from path pieces relative to `this.cwd`
-   */
-  private joinCwd(...paths: string[]): string {
-    return this._path.join(this.cwd, ...paths);
+    return map(get("path"), this._readdirp.promise(abspath));
   }
 }

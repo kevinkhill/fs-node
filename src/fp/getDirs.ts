@@ -11,7 +11,7 @@ export async function getDirs(
   vault: FsVault,
   relpath?: string
 ): Promise<FsNode[]> {
-  const $this = relpath ? vault.chroot(relpath) : vault;
+  const $this = relpath ? vault.clone(relpath) : vault;
 
   const dirs = onlyDirs(await ls($this));
 

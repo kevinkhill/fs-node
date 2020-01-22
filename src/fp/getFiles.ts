@@ -9,12 +9,13 @@ import { noDotfiles, onlyFiles } from "../lib";
  */
 export async function getFiles(
   vault: FsVault,
-  relpath?: string
+  relpath?: string,
+  options = { dotfiles: false }
 ): Promise<FsNode[]> {
-  const $this = relpath ? vault.chroot(relpath) : vault;
+  const $this = relpath ? vault.clone(relpath) : vault;
   const files = onlyFiles(await ls($this));
 
-  if (vault.options.dotfiles === false) {
+  if (options.dotfiles === false) {
     return noDotfiles(files);
   }
 

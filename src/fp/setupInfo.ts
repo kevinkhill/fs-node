@@ -12,7 +12,7 @@ export async function getSetupInfo(
   vault: FsVault,
   relpath?: string
 ): Promise<FsNode | undefined> {
-  const $this = relpath ? vault.chroot(relpath) : vault;
+  const $this = relpath ? vault.clone(relpath) : vault;
 
   if ((await hasSetupInfo($this)) === false) {
     return undefined;

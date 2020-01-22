@@ -12,12 +12,12 @@ export async function ls(
   vault: FsVault,
   relpath?: string
 ): Promise<FsNode[]> {
-  const $this = relpath ? vault.chroot(relpath) : vault;
+  const $this = relpath ? vault.clone(relpath) : vault;
 
   const nodes = await Promise.all(
     map(
       (abspath: string) => createFsNode($this, abspath),
-      await vault.readdir(this.cwd)
+      await $this.readdir($this.cwd)
     )
   );
 
