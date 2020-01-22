@@ -1,9 +1,8 @@
 import fs from "fs";
-import { clone, find, get, map } from "lodash/fp";
+import { get, map } from "lodash/fp";
 import path from "path";
 import readdirp from "readdirp";
 
-import { hasSetupNode } from "./lib";
 import { FilterList, FsNode, NwRequire, VaultOptions } from "./types";
 
 export class FsVault {
@@ -96,19 +95,26 @@ export class FsVault {
   }
 
   /**
-   * Check if the given path is an absolute path
-   */
-  isAbsPath(filepath: string): boolean {
-    return this._path.isAbsolute(filepath);
-  }
-
-  /**
    * Set a new root directory for the vault
    */
   setRoot(rootPath: string): void {
     const { resolve, normalize } = this._path;
 
     this.root = resolve(normalize(rootPath));
+  }
+
+  /**
+   * Build a path from path pieces relative to `this.root`
+   */
+  joinRoot(...paths: string[]): string {
+    return this._path.join(this.root, ...paths);
+  }
+
+  /**
+   * Check if the given path is an absolute path
+   */
+  isAbsPath(filepath: string): boolean {
+    return this._path.isAbsolute(filepath);
   }
 
   /**
@@ -121,22 +127,17 @@ export class FsVault {
   /**
    * Get a listing of all the files from `this.root`
    */
-  async getIndex(): Promise<string[]> {
+  getIndex(): Promise<string[]> {
     return this.readdirp(this.root);
   }
 
   /**
    * Rescan the vault for files and populate the index
    */
-  async rebuildIndex(): Promise<void> {
+  async rebuildIndex(): Promise<string[]> {
     this.index = await this.getIndex();
-  }
 
-  /**
-   * Build a path from path pieces relative to `this.root`
-   */
-  public joinRoot(...paths: string[]): string {
-    return this._path.join(this.root, ...paths);
+    return this.index;
   }
 
   /**
@@ -179,6 +180,6 @@ export class FsVault {
       throw Error("readdirp must be given an absolute path");
     }
 
-    return map(get("path"), this._readdirp.promise(abspath));
+    return map(get("path"), await this._readdirp.promise(abspath));
   }
 }

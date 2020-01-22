@@ -2,20 +2,19 @@ import path from "path";
 import map from "lodash/fp/map";
 
 import { FsVault } from "../src";
+import { getFiles, getDirs } from "../src/fp";
 
 let vault: FsVault;
 
 beforeEach(() => {
-  vault = new FsVault({
-    root: path.join(__dirname, "vault")
-  });
+  vault = FsVault.create(path.join(__dirname, "vault"));
 });
 
 test("cd('/sys_1/part_A')", async (done) => {
   vault.cd("/sys_1/part_A");
 
-  const dirs = await vault.getDirs();
-  const files = await vault.getFiles();
+  const dirs = await getDirs(vault);
+  const files = await getFiles(vault);
   const fileNames = map("name", files);
 
   expect(dirs).toHaveLength(0);
@@ -32,11 +31,11 @@ test("cd('/job_9/part_E') from sub-folder", async (done) => {
   vault.cd("sys_1");
   vault.cd("/job_9/part_E");
 
-  const dirs = await vault.getDirs();
-  const files = await vault.getFiles();
+  const dirs = await getDirs(vault);
+  const files = await getFiles(vault);
   const fileNames = map("name", files);
 
-  expect(dirs).toHaveLength(0);
+  expect(dirs).toHaveLength(2);
   expect(files).toHaveLength(6);
 
   expect(fileNames).toContain("file_op1.mcam");

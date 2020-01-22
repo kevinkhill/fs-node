@@ -1,8 +1,11 @@
-import { any, find } from "lodash/fp";
+import { any, find, propEq } from "lodash/fp";
 
 import { FsNode, FsVault } from "../index";
-import { isSetupNode } from "../lib";
 import { getDirs, ls } from "./index";
+
+export const isSetupNode = propEq("name", "SETUP_INFO");
+
+export const hasSetupNode = any(isSetupNode);
 
 export async function hasSetupInfo(vault: FsVault): Promise<boolean> {
   return any(isSetupNode, await getDirs(vault));
@@ -18,8 +21,5 @@ export async function getSetupInfo(
     return undefined;
   }
 
-  return find(
-    (node: FsNode) => node.name === "SETUP_INFO",
-    await ls($this)
-  );
+  return find(isSetupNode, await ls($this));
 }

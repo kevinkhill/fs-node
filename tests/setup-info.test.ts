@@ -1,25 +1,25 @@
 import path from "path";
+import map from "lodash/fp/map";
 
 import { FsVault } from "../src";
+import { hasSetupInfo, getSetupInfo } from "../src/fp";
 
 let vault: FsVault;
 
 beforeEach(() => {
-  vault = new FsVault({
-    root: path.join(__dirname, "vault")
-  });
+  vault = FsVault.create(path.join(__dirname, "vault"));
 });
 
 test("Check if this.cwd contains a 'SETUP_INFO' dir", async (done) => {
   vault.cd("job_9/part_D");
 
-  expect(await vault.hasSetupInfo()).toBeTruthy();
+  expect(await hasSetupInfo(vault)).toBeTruthy();
 
   done();
 });
 
 test("Check if a given relative path contains a 'SETUP_INFO' dir", async (done) => {
-  expect(await vault.hasSetupInfo("job_9/part_D")).toBeTruthy();
+  expect(await hasSetupInfo(vault, "job_9/part_D")).toBeTruthy();
 
   done();
 });
@@ -27,9 +27,9 @@ test("Check if a given relative path contains a 'SETUP_INFO' dir", async (done) 
 test("Get a 'SETUP_INFO' dir", async (done) => {
   vault.cd("misc");
 
-  expect(await vault.hasSetupInfo()).toBeTruthy();
+  expect(await hasSetupInfo(vault)).toBeTruthy();
 
-  const setupInfo = await vault.getSetupInfo();
+  const setupInfo = await getSetupInfo(vault);
 
   expect(setupInfo).toHaveLength(3);
 
