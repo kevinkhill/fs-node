@@ -1,12 +1,13 @@
+import { getDirs, getFiles } from "../fp";
+import FsNode from "./FsNode";
+
+export { FsNode };
+
 export type FilterList = Partial<Record<string, string[]>>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type NwRequire = (id: string) => any;
-
-export interface GetFilesOptions {
-  dotfiles?: boolean;
-  onlyExt?: string;
-  extWhitelist?: string[];
+export interface FsActions {
+  getDirs: typeof getDirs;
+  getFiles: typeof getFiles;
 }
 
 export interface VaultOptions {
@@ -19,16 +20,4 @@ export interface VaultOptions {
     ext?: string[];
     filename?: string[];
   };
-}
-
-export interface FsNode {
-  name: string;
-  ext?: string;
-  dir: string;
-  root: string;
-  abspath: string;
-  relpath: string;
-  isFile: boolean;
-  isImage: boolean;
-  isDirectory: boolean;
 }

@@ -3,7 +3,11 @@ import { get, map } from "lodash/fp";
 import path from "path";
 import readdirp from "readdirp";
 
-import { FilterList, FsNode, NwRequire, VaultOptions } from "./types";
+import { getDirs, getFiles } from "./fp";
+import { isNw, nwRequire } from "./lib";
+import { FilterList, FsActions, FsNode, VaultOptions } from "./types";
+
+const fsp = fs.promises;
 
 export class FsVault {
   root = "";
@@ -19,10 +23,6 @@ export class FsVault {
 
   index: string[] = [];
   contents: FsNode[] = [];
-
-  private _path: typeof path;
-  private _fs: typeof fs.promises;
-  private _readdirp: typeof readdirp;
 
   /**
    * Return `this.cwd` as an absolute path
@@ -44,18 +44,6 @@ export class FsVault {
   }
 
   constructor(options?: VaultOptions) {
-    if (typeof window !== "undefined" && "nw" in window) {
-      const nwRequire: NwRequire = get("nw.require", window);
-
-      this._path = nwRequire("path");
-      this._fs = nwRequire("fs").promises;
-      this._readdirp = nwRequire("readdirp");
-    } else {
-      this._path = path;
-      this._fs = fs.promises;
-      this._readdirp = readdirp;
-    }
-
     if (options && "root" in options) {
       this.setRoot(options.root);
     }
@@ -64,23 +52,26 @@ export class FsVault {
   /**
    * Behaves the same way `cd` does, with `/` acting as `this.root`
    */
-  cd(fspath = "/"): this {
+  cd(fspath = "/"): FsActions {
     if (fspath.startsWith("/")) {
       this.currentDir = fspath;
     } else {
-      this.currentDir = this._path.join(this.currentDir, fspath);
+      this.currentDir = path.join(this.currentDir, fspath);
     }
 
     // this.ls().then(contents => (this.contents = contents));
 
-    return this;
+    return {
+      getDirs: () => getDirs(this),
+      getFiles: () => getFiles(this)
+    };
   }
 
   /**
    * Split a path into its pieces
    */
   split(filepath: string): string[] {
-    return filepath.split(this._path.sep);
+    return filepath.split(path.sep);
   }
 
   /**
@@ -98,7 +89,7 @@ export class FsVault {
    * Set a new root directory for the vault
    */
   setRoot(rootPath: string): void {
-    const { resolve, normalize } = this._path;
+    const { resolve, normalize } = path;
 
     this.root = resolve(normalize(rootPath));
   }
@@ -107,21 +98,21 @@ export class FsVault {
    * Build a path from path pieces relative to `this.root`
    */
   joinRoot(...paths: string[]): string {
-    return this._path.join(this.root, ...paths);
+    return path.join(this.root, ...paths);
   }
 
   /**
    * Check if the given path is an absolute path
    */
   isAbsPath(filepath: string): boolean {
-    return this._path.isAbsolute(filepath);
+    return path.isAbsolute(filepath);
   }
 
   /**
    * Get the stats for a file
    */
   getStats(filepath: string): Promise<fs.Stats> {
-    return this._fs.lstat(filepath);
+    return fsp.lstat(filepath);
   }
 
   /**
@@ -143,16 +134,16 @@ export class FsVault {
   /**
    * Read a directory for files
    */
-  public async readFile(abspath: string): Promise<string> {
-    if (!this.isAbsPath(abspath)) {
-      throw Error("readdir must be given an absolute path");
+  public async readFile(node: FsNode): Promise<string> {
+    if (node.isDirectory) {
+      throw Error(
+        "readFile must be given a FsNode where node.isFile === true"
+      );
     }
 
-    const contents = (await this._fs.readFile(abspath)).toString();
+    const buffer = await fsp.readFile(node.abspath);
 
-    // console.log(contents);
-
-    return contents;
+    return buffer.toString();
   }
 
   /**
@@ -165,7 +156,7 @@ export class FsVault {
 
     const contents = map(entry => {
       return this.joinRoot(this.currentDir, entry);
-    }, await this._fs.readdir(abspath));
+    }, await fsp.readdir(abspath));
 
     // console.log(contents);
 
@@ -180,6 +171,6 @@ export class FsVault {
       throw Error("readdirp must be given an absolute path");
     }
 
-    return map(get("path"), await this._readdirp.promise(abspath));
+    return map(get("path"), await readdirp.promise(abspath));
   }
 }

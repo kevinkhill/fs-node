@@ -1,4 +1,4 @@
-import { map } from "lodash/fp";
+import { map, partial } from "lodash/fp";
 
 import { createFsNode } from "../fp";
 import { FsNode, FsVault } from "../index";
@@ -14,11 +14,10 @@ export async function ls(
 ): Promise<FsNode[]> {
   const $this = relpath ? vault.clone(relpath) : vault;
 
+  const nodeFactory = partial(createFsNode, [$this]);
+
   const nodes = await Promise.all(
-    map(
-      (abspath: string) => createFsNode($this, abspath),
-      await $this.readdir($this.cwd)
-    )
+    map(nodeFactory, await $this.readdir($this.cwd))
   );
 
   return nodes;
