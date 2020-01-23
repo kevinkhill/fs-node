@@ -1,17 +1,31 @@
-import { FsVault } from "..";
-import { clone } from "../fp";
+import path from "path";
+
+import { FsNode } from "..";
+import { clone, createFsNode } from "../fp";
 
 /**
- * Behaves the same way `cd` does, with `/` acting as `this.root`
+ * Behaves the same way `cd` does, with `/` acting as `this.dest`
  */
-export function cd(vault: FsVault, root = "/"): FsVault {
-  const $this = root ? clone(vault, root) : vault;
+// export function cd(vault: FsVault, dest = "/"): FsVault {
+//   const $this = dest ? clone(vault, dest) : vault;
 
-  if (root.startsWith("/")) {
-    this.currentDir = root;
+//   if (dest.startsWith("/")) {
+//     this.currentDir = dest;
+//   } else {
+//     this.currentDir = this._path.join(this.currentDir, dest);
+//   }
+
+//   return $this;
+// }
+
+export function cd(node: FsNode, dest = "/"): Promise<FsNode> {
+  let newDest;
+
+  if (dest.startsWith("/")) {
+    newDest = node.root;
   } else {
-    this.currentDir = this._path.join(this.currentDir, root);
+    newDest = path.join(node.abspath, dest);
   }
 
-  return $this;
+  return createFsNode(node, newDest);
 }
