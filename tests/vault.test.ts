@@ -1,11 +1,12 @@
 import path from "path";
 
 import { FsVault } from "../src";
+import { createVault } from "../src/fp";
 
 let vault: FsVault;
 
 beforeEach(() => {
-  vault = FsVault.create(path.join(__dirname, "vault"));
+  vault = createVault(path.join(__dirname, "vault"));
 });
 
 

@@ -3,23 +3,13 @@ import { get, map } from "lodash/fp";
 import path from "path";
 import readdirp from "readdirp";
 
-import { getDirs, getFiles } from "./fp";
-import { isNw, nwRequire } from "./lib";
-import { FilterList, FsActions, FsNode, VaultOptions } from "./types";
+import { FsNode, VaultOptions } from "./types";
 
 const fsp = fs.promises;
 
 export class FsVault {
   root = "";
   currentDir = "/";
-
-  whitelist: FilterList = {
-    ext: ["nc", "mcam"]
-  };
-
-  blacklist: FilterList = {
-    ext: []
-  };
 
   index: string[] = [];
   contents: FsNode[] = [];
@@ -31,40 +21,25 @@ export class FsVault {
     return this.joinRoot(this.currentDir);
   }
 
-  static create(root: string): FsVault {
-    return new FsVault({ root });
-  }
-
-  static fromNode(node: FsNode): FsVault {
-    const vault = FsVault.create(node.root);
-
-    vault.cd(node.relpath);
-
-    return vault;
-  }
-
   constructor(options?: VaultOptions) {
     if (options && "root" in options) {
-      this.setRoot(options.root);
+      const { resolve, normalize } = path;
+
+      this.root = resolve(normalize(options.root));
     }
   }
 
   /**
    * Behaves the same way `cd` does, with `/` acting as `this.root`
    */
-  cd(fspath = "/"): FsActions {
+  cd(fspath = "/"): this {
     if (fspath.startsWith("/")) {
       this.currentDir = fspath;
     } else {
       this.currentDir = path.join(this.currentDir, fspath);
     }
 
-    // this.ls().then(contents => (this.contents = contents));
-
-    return {
-      getDirs: () => getDirs(this),
-      getFiles: () => getFiles(this)
-    };
+    return this;
   }
 
   /**
@@ -72,26 +47,6 @@ export class FsVault {
    */
   split(filepath: string): string[] {
     return filepath.split(path.sep);
-  }
-
-  /**
-   * Clones the vault at the given relative path
-   */
-  clone(relpath?: string): FsVault {
-    const vault = FsVault.create(this.cwd);
-
-    vault.cd(relpath);
-
-    return vault;
-  }
-
-  /**
-   * Set a new root directory for the vault
-   */
-  setRoot(rootPath: string): void {
-    const { resolve, normalize } = path;
-
-    this.root = resolve(normalize(rootPath));
   }
 
   /**

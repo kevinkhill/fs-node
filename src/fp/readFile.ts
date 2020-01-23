@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import FsNode from "../types/FsNode";
+import { FsNode } from "../types";
 
 export async function readFile(node: FsNode): Promise<string> {
   if (node.isDirectory) {

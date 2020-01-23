@@ -2,12 +2,12 @@ import path from "path";
 import { get, map } from "lodash/fp";
 
 import { FsVault } from "../src";
-import { getFiles, getDirs } from "../src/fp";
+import { getFiles, getDirs, createVault } from "../src/fp";
 
 let vault: FsVault;
 
 beforeEach(() => {
-  vault = FsVault.create(path.join(__dirname, "vault"));
+  vault = createVault(path.join(__dirname, "vault"));
 });
 
 test("Count the files in /misc", async (done) => {
@@ -41,7 +41,7 @@ test("Count the files /job_9/part_E", async (done) => {
 test("Count the folders in /job_9/part_E", async (done) => {
   const dirs = await getDirs(vault, "job_9/part_E");
 
-  expect(dirs).toHaveLength(2);
+  expect(dirs).toHaveLength(0);
 
   done();
 });

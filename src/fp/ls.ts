@@ -1,7 +1,7 @@
 import { map, partial } from "lodash/fp";
 
-import { createFsNode } from "../fp";
-import { FsNode, FsVault } from "../index";
+import { FsNode, FsVault } from "..";
+import { clone, createFsNode } from "../fp";
 
 /**
  * Retrive a listing of all `FsNode` in `this.cwd`
@@ -12,7 +12,7 @@ export async function ls(
   vault: FsVault,
   relpath?: string
 ): Promise<FsNode[]> {
-  const $this = relpath ? vault.clone(relpath) : vault;
+  const $this = relpath ? clone(vault, relpath) : vault;
 
   const nodeFactory = partial(createFsNode, [$this]);
 

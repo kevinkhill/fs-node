@@ -1,5 +1,5 @@
-import { ls, readFile } from "../fp";
-import { FsNode, FsVault } from "../index";
+import { FsNode } from "../index";
+import { fromNode, ls, readFile } from ".";
 
 export function getContents(
   node: FsNode
@@ -24,7 +24,7 @@ async function getFileContents(node: FsNode): Promise<string> {
 }
 
 async function getFolderContents(node: FsNode): Promise<FsNode[]> {
-  const vault = FsVault.fromNode(node);
+  const vault = fromNode(node);
 
   return ls(vault);
 }

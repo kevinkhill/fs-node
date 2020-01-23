@@ -1,4 +1,4 @@
-import { FsVault } from "./FsVault";
-import { FsActions, FsNode, VaultOptions } from "./types";
-
-export { FsVault, FsActions, FsNode, VaultOptions };
+export * from "./fp";
+export * from "./lib";
+export { FsVault } from "./FsVault";
+export { FsNode, VaultOptions } from "./types";
