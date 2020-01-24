@@ -1,16 +1,15 @@
 import path from "path";
 import map from "lodash/fp/map";
 
-import { getFiles, getDirs, cd, node, FsNode } from "../src";
+import { getFiles, getDirs, cd, FsNode, createNode } from "../src";
 
 let root: FsNode;
 
-beforeEach(() => {
-  root = node(path.join(__dirname, "vault"));
+beforeEach(async () => {
+  root = await createNode(path.join(__dirname, "vault"));
 });
-
 test("cd('/sys_1/part_A')", async (done) => {
- const partA = await cd(root, "/sys_1/part_A");
+  const partA = await cd(root, "/sys_1/part_A");
 
   const dirs = await getDirs(partA);
   expect(dirs).toHaveLength(0);

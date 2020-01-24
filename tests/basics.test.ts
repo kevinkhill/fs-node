@@ -1,12 +1,12 @@
 import path from "path";
 import { get, map } from "lodash/fp";
 
-import { getFiles, getDirs, FsNode, node } from "../src";
+import { getFiles, getDirs, FsNode, createNode } from "../src";
 
 let root: FsNode;
 
-beforeEach(() => {
-  root = node(path.join(__dirname, "vault"));
+beforeEach(async () => {
+  root = await createNode(path.join(__dirname, "vault"));
 });
 
 test("Count the files in /misc", async (done) => {

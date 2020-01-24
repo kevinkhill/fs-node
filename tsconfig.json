@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "noEmit": true,
     "sourceMap": true,
     "target": "esnext",
@@ -8,8 +9,9 @@
     // "isolatedModules": true,
     "moduleResolution": "node",
     // "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext"]
   },
-  "include": ["bili.config.js", "src/*.ts", "src/**/*.ts"]
+  "include": ["bili.config.js", "src/*.ts"]
 }

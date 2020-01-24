@@ -1,21 +1,12 @@
-import { FsNode, ls, readFile } from ".";
+import { FsNode } from "./FsNode";
+import { ls } from "./ls";
+import { readFile } from "./readFile";
 
+/**
+ * Sugar function to handle either a file or dir node.
+ */
 export function getContents(
   node: FsNode
 ): Promise<string | FsNode[]> {
-  return node.isFile ? getFileContents(node) : ls(node);
-}
-
-async function getFileContents(node: FsNode): Promise<string> {
-  if (!node.isFile) {
-    throw Error(
-      "getFileContents() can only operate on FsNodes that are files."
-    );
-  }
-
-  try {
-    return await readFile(node);
-  } catch (error) {
-    return error.toString();
-  }
+  return node.isFile ? readFile(node) : ls(node);
 }

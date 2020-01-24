@@ -2,10 +2,12 @@ import fs from "fs";
 import map from "lodash/fp/map";
 import path from "path";
 
-import { cd, createFsNode, FsNode } from ".";
+import { FsNode } from "./FsNode";
+import { cd } from "./cd";
+import { createNode } from "./createNode";
 
 /**
- * Retrive all `FsNode` from the given node
+ * Retrive all {@link FsNode} from the given node
  */
 export async function ls(
   node: FsNode,
@@ -13,11 +15,12 @@ export async function ls(
 ): Promise<FsNode[]> {
   const dest = relpath ? await cd(node, relpath) : node;
 
-  const nodes = await Promise.all(
-    map((entry: string) => {
-      return createFsNode(dest, path.join(dest.abspath, entry));
-    }, await fs.promises.readdir(dest.abspath))
-  );
+  const pathEntries = await fs.promises.readdir(dest.abspath);
 
-  return nodes;
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  const nodeCreator = (entry: string): Promise<FsNode> => {
+    return createNode(path.join(dest.abspath, entry), dest);
+  };
+
+  return Promise.all(map(nodeCreator, pathEntries));
 }

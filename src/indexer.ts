@@ -6,7 +6,7 @@ import readdirp from "readdirp";
 import { FsNode } from "./FsNode";
 
 /**
- * Read a node for files
+ * Scan a node for files and return a list of paths
  */
 export async function scan(node: FsNode): Promise<string[]> {
   return map(entry => {

@@ -1,12 +1,12 @@
 import { any } from "lodash/fp";
 import path from "path";
 import { FsNode } from "../src";
-import { cd, getFiles, node, getDirs } from "../src";
+import { cd, getFiles, createNode, getDirs } from "../src";
 
 let root: FsNode;
 
-beforeEach(() => {
-  root = node(path.join(__dirname, "vault"));
+beforeEach(async () => {
+  root = await createNode(path.join(__dirname, "vault"));
 });
 
 test('Test cd from root to "misc"', async (done) => {

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1579901945431" clover="3.2.0">
+  <project timestamp="1579901945431" name="All files">
+    <metrics statements="106" coveredstatements="89" conditionals="26" coveredconditionals="13" methods="19" coveredmethods="11" elements="151" coveredelements="113" complexity="0" loc="106" ncloc="106" packages="1" files="12" classes="12"/>
+    <file name="cd.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\cd.ts">
+      <metrics statements="7" coveredstatements="7" conditionals="3" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="4" count="8" type="stmt"/>
+      <line num="9" count="8" type="cond" truecount="0" falsecount="1"/>
+      <line num="12" count="10" type="cond" truecount="2" falsecount="0"/>
+      <line num="13" count="2" type="stmt"/>
+      <line num="15" count="8" type="stmt"/>
+      <line num="18" count="10" type="stmt"/>
+    </file>
+    <file name="createNode.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\createNode.ts">
+      <metrics statements="13" coveredstatements="11" conditionals="6" coveredconditionals="4" methods="1" coveredmethods="1"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="2" count="8" type="stmt"/>
+      <line num="13" count="8" type="stmt"/>
+      <line num="17" count="53" type="cond" truecount="2" falsecount="0"/>
+      <line num="20" count="41" type="cond" truecount="1" falsecount="1"/>
+      <line num="21" count="41" type="stmt"/>
+      <line num="23" count="0" type="stmt"/>
+      <line num="26" count="41" type="stmt"/>
+      <line num="28" count="41" type="stmt"/>
+      <line num="30" count="41" type="stmt"/>
+      <line num="42" count="12" type="cond" truecount="1" falsecount="1"/>
+      <line num="43" count="0" type="stmt"/>
+      <line num="46" count="12" type="stmt"/>
+    </file>
+    <file name="filters.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\filters.ts">
+      <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="6" count="8" type="stmt"/>
+      <line num="7" count="1" type="stmt"/>
+      <line num="10" count="15" type="stmt"/>
+      <line num="12" count="16" type="stmt"/>
+    </file>
+    <file name="getContents.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\getContents.ts">
+      <metrics statements="4" coveredstatements="3" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <line num="2" count="8" type="stmt"/>
+      <line num="3" count="8" type="stmt"/>
+      <line num="8" count="8" type="stmt"/>
+      <line num="11" count="0" type="cond" truecount="0" falsecount="2"/>
+    </file>
+    <file name="getDirs.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\getDirs.ts">
+      <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <line num="2" count="8" type="stmt"/>
+      <line num="3" count="8" type="stmt"/>
+      <line num="4" count="8" type="stmt"/>
+      <line num="9" count="8" type="stmt"/>
+      <line num="13" count="5" type="cond" truecount="2" falsecount="0"/>
+      <line num="15" count="5" type="stmt"/>
+      <line num="17" count="5" type="stmt"/>
+    </file>
+    <file name="getFiles.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\getFiles.ts">
+      <metrics statements="10" coveredstatements="9" conditionals="5" coveredconditionals="4" methods="1" coveredmethods="1"/>
+      <line num="2" count="8" type="stmt"/>
+      <line num="3" count="8" type="stmt"/>
+      <line num="4" count="8" type="stmt"/>
+      <line num="5" count="8" type="stmt"/>
+      <line num="12" count="8" type="stmt"/>
+      <line num="17" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="19" count="4" type="stmt"/>
+      <line num="21" count="4" type="cond" truecount="1" falsecount="1"/>
+      <line num="22" count="4" type="stmt"/>
+      <line num="25" count="0" type="stmt"/>
+    </file>
+    <file name="index.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\index.ts">
+      <metrics statements="15" coveredstatements="15" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="3" count="8" type="stmt"/>
+      <line num="4" count="8" type="stmt"/>
+      <line num="5" count="8" type="stmt"/>
+      <line num="6" count="8" type="stmt"/>
+      <line num="7" count="8" type="stmt"/>
+      <line num="8" count="8" type="stmt"/>
+      <line num="9" count="8" type="stmt"/>
+      <line num="10" count="8" type="stmt"/>
+      <line num="11" count="8" type="stmt"/>
+      <line num="12" count="8" type="stmt"/>
+      <line num="13" count="8" type="stmt"/>
+      <line num="14" count="8" type="stmt"/>
+      <line num="15" count="8" type="stmt"/>
+      <line num="16" count="8" type="stmt"/>
+    </file>
+    <file name="indexer.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\indexer.ts">
+      <metrics statements="9" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="1"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="2" count="8" type="stmt"/>
+      <line num="3" count="8" type="stmt"/>
+      <line num="4" count="8" type="stmt"/>
+      <line num="11" count="8" type="stmt"/>
+      <line num="12" count="0" type="stmt"/>
+      <line num="13" count="0" type="stmt"/>
+      <line num="20" count="8" type="stmt"/>
+      <line num="21" count="1" type="stmt"/>
+    </file>
+    <file name="ls.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\ls.ts">
+      <metrics statements="11" coveredstatements="11" conditionals="2" coveredconditionals="1" methods="2" coveredmethods="2"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="2" count="8" type="stmt"/>
+      <line num="3" count="8" type="stmt"/>
+      <line num="6" count="8" type="stmt"/>
+      <line num="7" count="8" type="stmt"/>
+      <line num="12" count="8" type="stmt"/>
+      <line num="16" count="9" type="cond" truecount="1" falsecount="1"/>
+      <line num="18" count="9" type="stmt"/>
+      <line num="21" count="9" type="stmt"/>
+      <line num="22" count="31" type="stmt"/>
+      <line num="25" count="9" type="stmt"/>
+    </file>
+    <file name="readFile.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\readFile.ts">
+      <metrics statements="8" coveredstatements="2" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="5" count="8" type="stmt"/>
+      <line num="6" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="7" count="0" type="stmt"/>
+      <line num="10" count="0" type="stmt"/>
+      <line num="11" count="0" type="stmt"/>
+      <line num="13" count="0" type="stmt"/>
+      <line num="15" count="0" type="stmt"/>
+    </file>
+    <file name="rejects.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\rejects.ts">
+      <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="1"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="5" count="8" type="stmt"/>
+      <line num="7" count="8" type="stmt"/>
+      <line num="9" count="8" type="stmt"/>
+      <line num="10" count="13" type="stmt"/>
+    </file>
+    <file name="setupInfo.ts" path="H:\projects\harris-bruno\cnc-assistant\program-vault\src\setupInfo.ts">
+      <metrics statements="12" coveredstatements="7" conditionals="4" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <line num="1" count="8" type="stmt"/>
+      <line num="4" count="8" type="stmt"/>
+      <line num="5" count="8" type="stmt"/>
+      <line num="7" count="8" type="stmt"/>
+      <line num="8" count="0" type="stmt"/>
+      <line num="10" count="8" type="stmt"/>
+      <line num="12" count="8" type="stmt"/>
+      <line num="14" count="8" type="stmt"/>
+      <line num="18" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="20" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="21" count="0" type="stmt"/>
+      <line num="24" count="0" type="stmt"/>
+    </file>
+  </project>
+</coverage>

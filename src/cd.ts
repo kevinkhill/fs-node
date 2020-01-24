@@ -1,6 +1,7 @@
 import path from "path";
 
-import { createFsNode, FsNode } from ".";
+import { FsNode } from "./FsNode";
+import { createNode } from "./createNode";
 
 /**
  * Behaves the same way `cd` does, with `/` acting as `this.dest`
@@ -14,5 +15,5 @@ export function cd(node: FsNode, dest = "/"): Promise<FsNode> {
     newDest = path.join(node.abspath, dest);
   }
 
-  return createFsNode(node, newDest);
+  return createNode(newDest, node);
 }

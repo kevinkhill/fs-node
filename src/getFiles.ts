@@ -1,5 +1,14 @@
-import { cd, FsNode, ls, noDotfiles, onlyFiles } from ".";
+import { FsNode } from "./FsNode";
+import { cd } from "./cd";
+import { onlyFiles } from "./filters";
+import { ls } from "./ls";
+import { noDotfiles } from "./rejects";
 
+/**
+ * Sugar function to get only files from a node
+ *
+ * Provides the option to inlcude dotfiles
+ */
 export async function getFiles(
   node: FsNode,
   relpath?: string,

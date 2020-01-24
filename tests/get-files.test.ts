@@ -1,11 +1,11 @@
 import path from "path";
 
-import { onlyExt, getFiles, FsNode, node, cd } from "../src";
+import { onlyExt, getFiles, FsNode, createNode, cd } from "../src";
 
 let root: FsNode;
 
-beforeEach(() => {
-  root = node(path.join(__dirname, "vault"));
+beforeEach(async () => {
+  root = await createNode(path.join(__dirname, "vault"));
 });
 
 test('Test extension filter creation function on getFiles', async (done) => {

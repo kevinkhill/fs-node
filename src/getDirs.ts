@@ -1,7 +1,10 @@
-import { cd, FsNode, ls, onlyDirs } from ".";
+import { FsNode } from "./FsNode";
+import { cd } from "./cd";
+import { onlyDirs } from "./filters";
+import { ls } from "./ls";
 
 /**
- * Get a listing of all the file `FsNode` in `this.cwd`
+ * Sugar function to get only dir nodes
  */
 export async function getDirs(
   node: FsNode,

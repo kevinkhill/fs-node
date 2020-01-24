@@ -1,11 +1,11 @@
 import path from "path";
 
-import { FsNode, node, crawl } from "../src";
+import { FsNode, crawl, createNode } from "../src";
 
 let root: FsNode;
 
-beforeEach(() => {
-  root = node(path.join(__dirname, "vault"));
+beforeEach(async () => {
+  root = await createNode(path.join(__dirname, "vault"));
 });
 
 test('Scan vault.root and check file count', async (done) => {

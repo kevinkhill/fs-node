@@ -1,12 +1,12 @@
 import path from "path";
 import map from "lodash/fp/map";
 
-import { hasSetupInfo, getSetupInfo, FsNode, node, cd } from "../src";
+import { hasSetupInfo, getSetupInfo, FsNode, createNode, cd } from "../src";
 
 let root: FsNode;
 
-beforeEach(() => {
-  root = node(path.join(__dirname, "vault"));
+beforeEach(async () => {
+  root = await createNode(path.join(__dirname, "vault"));
 });
 
 test.skip("Check if this.cwd contains a 'SETUP_INFO' dir", async (done) => {
