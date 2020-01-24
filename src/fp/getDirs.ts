@@ -1,5 +1,5 @@
-import { FsNode, FsVault } from "..";
-import { clone, ls, onlyDirs } from "../fp";
+import { FsNode } from "..";
+import { cd, ls, onlyDirs } from "../fp";
 
 /**
  * Get a listing of all the file `FsNode` in `this.cwd`
@@ -7,12 +7,12 @@ import { clone, ls, onlyDirs } from "../fp";
  * Use the `{ dotfiles }` option to reveal `.*` files if needed
  */
 export async function getDirs(
-  vault: FsVault,
+  node: FsNode,
   relpath?: string
 ): Promise<FsNode[]> {
-  const $this = relpath ? clone(vault, relpath) : vault;
+  const dest = relpath ? await cd(node, relpath) : node;
 
-  const dirs = onlyDirs(await ls($this));
+  const dirs = onlyDirs(await ls(dest));
 
   return dirs;
 }

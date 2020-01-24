@@ -4,9 +4,7 @@ import { fromNode, ls, readFile } from ".";
 export function getContents(
   node: FsNode
 ): Promise<string | FsNode[]> {
-  return node.isFile
-    ? getFileContents(node)
-    : getFolderContents(node);
+  return node.isFile ? getFileContents(node) : ls(node);
 }
 
 async function getFileContents(node: FsNode): Promise<string> {
@@ -21,10 +19,4 @@ async function getFileContents(node: FsNode): Promise<string> {
   } catch (error) {
     return error.toString();
   }
-}
-
-async function getFolderContents(node: FsNode): Promise<FsNode[]> {
-  const vault = fromNode(node);
-
-  return ls(vault);
 }

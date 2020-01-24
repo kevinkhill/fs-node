@@ -1,30 +1,24 @@
 import { any, find } from "lodash/fp";
 
-import { FsNode, FsVault } from "..";
-import { clone, getDirs, ls } from ".";
+import { FsNode } from "..";
+import { cd, ls } from ".";
 
 export const isSetupNode = (node: FsNode): boolean =>
   node.name === "SETUP_INFO";
 
 export const hasSetupNode = any(isSetupNode);
 
-export async function hasSetupInfo(
-  node: FsVault | FsNode[]
-): Promise<boolean> {
-  const nodes = node instanceof FsVault ? await getDirs(node) : node;
-
-  return hasSetupNode(nodes);
-}
+export const hasSetupInfo = any(hasSetupNode);
 
 export async function getSetupInfo(
-  vault: FsVault,
+  node: FsNode,
   relpath?: string
 ): Promise<FsNode | undefined> {
-  const $this = relpath ? clone(vault, relpath) : vault;
+  const dest = relpath ? await cd(node, relpath) : node;
 
-  if ((await hasSetupInfo($this)) === false) {
+  if ((await hasSetupInfo(dest)) === false) {
     return undefined;
   }
 
-  return find(isSetupNode, await ls($this));
+  return find(isSetupNode, await ls(dest));
 }

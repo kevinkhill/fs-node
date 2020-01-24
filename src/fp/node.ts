@@ -1,19 +1,21 @@
-import fs from "fs";
 import path from "path";
 
 import { FsNode } from "../types";
 
 export function node(root: string): FsNode {
-  if (!path.isAbsolute(root)) throw Error("root must be absolute");
+  if (!path.isAbsolute(root)) {
+    throw Error("root must be an absolute path");
+  }
 
-  // const name = root.split(path.sep).pop();
+  const name = root.split(path.sep).pop();
 
   return Object.freeze({
-    name: "[ROOT]",
+    name,
     root,
     dir: "",
     relpath: "/",
     abspath: root,
+    isRoot: true,
     isFile: false,
     isImage: false,
     isDirectory: true

@@ -1,7 +1,8 @@
+import { any } from "lodash/fp";
 import path from "path";
-
 import { FsNode } from "../src";
-import { onlyExt, getFiles, node, cd } from "../src/fp";
+import { cd, getFiles, node, getDirs } from "../src/fp";
+
 
 let root: FsNode;
 
@@ -9,21 +10,23 @@ beforeEach(() => {
   root = node(path.join(__dirname, "vault"));
 });
 
+test('Test cd from root to "misc"', async (done) => {
+  const miscDir = await cd(root, "misc");
+  const miscFiles = await getFiles(miscDir);
+
+  expect(miscFiles).toHaveLength(1);
+  expect(any(["name", "test_1.nc"], miscFiles)).toBeTruthy();
+
+  done();
+});
+
 test('Test extension filter creation function on getFiles', async (done) => {
-  const onlyNc = onlyExt("nc");
-  const onlyMcam = onlyExt("mcam");
-  const onlySld = onlyExt("sldprt");
+  const sys1Dir = await cd(root, "sys_1");
+  const sys1DirFolders = await getDirs(sys1Dir);
 
-  const partBDir = await cd(root, "sys_1/part_B");
-
-  const ncFiles = onlyNc(await getFiles(partBDir));
-  expect(ncFiles).toHaveLength(3);
-
-  const mcamFiles = onlyMcam(await getFiles(partBDir));
-  expect(mcamFiles).toHaveLength(1);
-
-  const sldFiles = onlySld(await getFiles(partBDir));
-  expect(sldFiles).toHaveLength(1);
+  expect(sys1DirFolders).toHaveLength(2);
+  expect(any(["name", "part_A"], sys1DirFolders)).toBeTruthy();
+  expect(any(["name", "part_B"], sys1DirFolders)).toBeTruthy();
 
   done();
 });
