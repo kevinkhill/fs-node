@@ -1,19 +1,18 @@
 import path from "path";
 import map from "lodash/fp/map";
 
-import { FsVault } from "../src";
-import { hasSetupInfo, getSetupInfo, createVault } from "../src/fp";
+import { hasSetupInfo, getSetupInfo, FsNode, node, cd } from "../src";
 
-let vault: FsVault;
+let root: FsNode;
 
 beforeEach(() => {
-  vault = createVault(path.join(__dirname, "vault"));
+  root = node(path.join(__dirname, "vault"));
 });
 
 test.skip("Check if this.cwd contains a 'SETUP_INFO' dir", async (done) => {
-  vault.cd("job_9/part_D");
+  const partD = await cd(root, "job_9/part_D");
 
-  expect(await hasSetupInfo(vault)).toBeTruthy();
+  expect(await hasSetupInfo(partD)).toBeTruthy();
 
   done();
 });
@@ -25,11 +24,11 @@ test.skip("Check if this.cwd contains a 'SETUP_INFO' dir", async (done) => {
 // });
 
 test.skip("Get a 'SETUP_INFO' dir", async (done) => {
-  vault.cd("misc");
+  const misc = await cd(root, "misc");
 
-  expect(await hasSetupInfo(vault)).toBeTruthy();
+  expect(await hasSetupInfo(misc)).toBeTruthy();
 
-  const setupInfo = await getSetupInfo(vault);
+  const setupInfo = await getSetupInfo(misc);
 
   expect(setupInfo).toHaveLength(3);
 

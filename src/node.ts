@@ -1,6 +1,6 @@
 import path from "path";
 
-import { FsNode } from "../types";
+import { FsNode } from "./FsNode";
 
 export function node(root: string): FsNode {
   if (!path.isAbsolute(root)) {

@@ -1,34 +1,23 @@
 import path from "path";
 
-import { FsVault } from "../src";
-import { onlyExt, getFiles, createVault } from "../src/fp";
+import { onlyExt, getFiles, FsNode, node, cd } from "../src";
 
-let vault: FsVault;
+let root: FsNode;
 
 beforeEach(() => {
-  vault = createVault(path.join(__dirname, "vault"));
+  root = node(path.join(__dirname, "vault"));
 });
 
 test('Test extension filter creation function on getFiles', async (done) => {
-  vault.cd("sys_1/part_B");
+  const partB = await cd(root, "sys_1/part_B");
 
-  const onlyNc = onlyExt("nc");
-
-  const ncFiles = onlyNc(await getFiles(vault));
-
+  const ncFiles = onlyExt("nc")(await getFiles(partB));
   expect(ncFiles).toHaveLength(3);
 
-  const onlyMcam = onlyExt("mcam");
-
-  const mcamFiles = onlyMcam(await getFiles(vault));
-
+  const mcamFiles = onlyExt("mcam")(await getFiles(partB));
   expect(mcamFiles).toHaveLength(1);
 
-
-  const onlySld = onlyExt("sldprt");
-
-  const sldFiles = onlySld(await getFiles(vault));
-
+  const sldFiles = onlyExt("sldprt")(await getFiles(partB));
   expect(sldFiles).toHaveLength(1);
 
   done();

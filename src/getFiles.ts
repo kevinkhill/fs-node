@@ -1,5 +1,4 @@
-import { FsNode } from "..";
-import { cd, ls, noDotfiles, onlyFiles } from "../fp";
+import { cd, FsNode, ls, noDotfiles, onlyFiles } from ".";
 
 export async function getFiles(
   node: FsNode,

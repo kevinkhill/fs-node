@@ -1,8 +1,7 @@
 import { any } from "lodash/fp";
 import path from "path";
 import { FsNode } from "../src";
-import { cd, getFiles, node, getDirs } from "../src/fp";
-
+import { cd, getFiles, node, getDirs } from "../src";
 
 let root: FsNode;
 

@@ -1,6 +1,6 @@
 import { filter, propEq } from "lodash/fp";
 
-import { FsNode } from "../types";
+import { FsNode } from "./FsNode";
 
 /**
  * Filters

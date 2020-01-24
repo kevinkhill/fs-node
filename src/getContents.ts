@@ -1,5 +1,4 @@
-import { FsNode } from "../index";
-import { fromNode, ls, readFile } from ".";
+import { FsNode, ls, readFile } from ".";
 
 export function getContents(
   node: FsNode

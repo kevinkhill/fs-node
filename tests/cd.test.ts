@@ -1,22 +1,21 @@
 import path from "path";
 import map from "lodash/fp/map";
 
-import { FsVault } from "../src";
-import { getFiles, getDirs, createVault } from "../src/fp";
+import { getFiles, getDirs, cd, node, FsNode } from "../src";
 
-let vault: FsVault;
+let root: FsNode;
 
 beforeEach(() => {
-  vault = createVault(path.join(__dirname, "vault"));
+  root = node(path.join(__dirname, "vault"));
 });
 
 test("cd('/sys_1/part_A')", async (done) => {
-  vault.cd("/sys_1/part_A");
+ const partA = await cd(root, "/sys_1/part_A");
 
-  const dirs = await getDirs(vault);
+  const dirs = await getDirs(partA);
   expect(dirs).toHaveLength(0);
 
-  const files = await getFiles(vault);
+  const files = await getFiles(partA);
   const fileNames = map("name", files);
 
   expect(files).toHaveLength(3);
@@ -28,13 +27,12 @@ test("cd('/sys_1/part_A')", async (done) => {
 });
 
 test("cd('/job_9/part_E') from sub-folder", async (done) => {
-  vault.cd("sys_1");
-  vault.cd("/job_9/part_E");
+  const partE = await cd(root, "/job_9/part_E");
 
-  const dirs = await getDirs(vault);
+  const dirs = await getDirs(partE);
   expect(dirs).toHaveLength(0);
 
-  const files = await getFiles(vault);
+  const files = await getFiles(partE);
   const fileNames = map("name", files);
 
   expect(files).toHaveLength(6);

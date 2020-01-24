@@ -1,10 +1,7 @@
-import { FsNode } from "..";
-import { cd, ls, onlyDirs } from "../fp";
+import { cd, FsNode, ls, onlyDirs } from ".";
 
 /**
  * Get a listing of all the file `FsNode` in `this.cwd`
- *
- * Use the `{ dotfiles }` option to reveal `.*` files if needed
  */
 export async function getDirs(
   node: FsNode,
