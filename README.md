@@ -1,9 +1,9 @@
 # fs-node
-🗂️ Create a Root `FsNode`
-📂 Get some folders (They're also `FsNode`s) 
-📄 Get some files (nodes!) 
-🔬 It has tests ![ts-jest](https://github.com/kevinkhill/fs-node/workflows/Test/badge.svg?branch=master)
-♻️ Made from pure functions
+🗂️ Create a Root `FsNode`  
+📂 Get some folders (They're also `FsNode`s)  
+📄 Get some files (nodes!)  
+🔬 It has tests ![ts-jest](https://github.com/kevinkhill/fs-node/workflows/Test/badge.svg?branch=master)  
+♻️ Made from pure functions  
 
 # Why? 
 I wanted an easy way to travel around the file system. I'm also learning about functional programming and wanted a project to play with both `TypeScript` and `lodash/fp`
