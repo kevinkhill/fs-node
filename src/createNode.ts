@@ -14,16 +14,16 @@ export async function createNode(
   abspath: string,
   fromNode?: FsNode
 ): Promise<FsNode> {
+  let name;
+
+  if (path.isAbsolute(abspath)) {
+    name = abspath.split(path.sep).pop();
+  } else {
+    name = abspath;
+  }
+
   if (fromNode) {
-    let name;
-
-    if (path.isAbsolute(abspath)) {
-      name = abspath.split(path.sep).pop();
-    } else {
-      name = abspath;
-    }
-
-    console.log(fromNode, name);
+    // console.log(fromNode, name);
 
     const stats = await fs.promises.lstat(abspath);
 

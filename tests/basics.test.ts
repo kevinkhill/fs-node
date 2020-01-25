@@ -40,7 +40,7 @@ test("Count the files /job_9/part_E", async (done) => {
 test("Count the folders in /job_9/part_E", async (done) => {
   const dirs = await getDirs(root, "job_9/part_E");
 
-  expect(dirs).toHaveLength(0);
+  expect(dirs).toHaveLength(2);
 
   done();
 });

@@ -8,7 +8,7 @@ beforeEach(async () => {
   root = await createNode(path.join(__dirname, "vault"));
 });
 
-test('Test extension filter creation function on getFiles', async (done) => {
+test.skip('Test extension filter creation function on getFiles', async (done) => {
   const partB = await cd(root, "sys_1/part_B");
 
   const ncFiles = onlyExt("nc")(await getFiles(partB));
