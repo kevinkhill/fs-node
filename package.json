@@ -1,9 +1,16 @@
 {
-  "name": "program-vault",
+  "name": "fs-node",
   "version": "1.0.0",
   "private": true,
   "main": "./dist/index.js",
   "module": "./dist/index.esm.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kevinkhill/fs-node.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "files": [
     "dist"
   ],
@@ -16,10 +23,9 @@
   "scripts": {
     "build": "bili",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "test:file": "jest --watch --testRegex",
+    "test-file": "jest --watch --testRegex",
     "lint": "eslint --ext=.ts ./src",
-    "lint:fix": "yarn lint --fix"
+    "lint-fix": "yarn lint --fix"
   },
   "jest": {
     "preset": "ts-jest"
