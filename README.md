@@ -1,7 +1,12 @@
 # fs-node
-Create a node. Get some 📂s, get some 📄s. 
+🗂️ Create a Root `FsNode`
+📂 Get some folders (They're also `FsNode`s) 
+📄 Get some files (nodes!) 
+🔬 It has tests ![ts-jest](https://github.com/kevinkhill/fs-node/workflows/Test/badge.svg?branch=master)
+♻️ Made from pure functions
 
-![ts-jest](https://github.com/kevinkhill/fs-node/workflows/Test/badge.svg?branch=master)
+# Why? 
+I wanted an easy way to travel around the file system. I'm also learning about functional programming and wanted a project to play with both `TypeScript` and `lodash/fp`
 
 # Install
 `yarn add fs-node`
