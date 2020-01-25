@@ -28,7 +28,7 @@ test("cd(root, '/job_9/part_E') from sub-folder", async (done) => {
   const partE = await cd(root, "job_9/part_E");
 
   const dirs = await getDirs(partE);
-  expect(dirs).toHaveLength(2);
+  expect(dirs).toHaveLength(0);
 
   const files = await getFiles(partE);
   const fileNames = map("name", files);
