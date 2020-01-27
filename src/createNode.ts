@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import { FsNode } from "./FsNode";
+import { FsNode } from ".";
 
 /**
  * Create a new {@link FsNode} from an absolute path

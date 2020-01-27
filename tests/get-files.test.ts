@@ -10,14 +10,15 @@ beforeEach(async () => {
 
 test.skip('Test extension filter creation function on getFiles', async (done) => {
   const partB = await cd(root, "sys_1/part_B");
+  const files = await getFiles(partB);
 
-  const ncFiles = onlyExt("nc")(await getFiles(partB));
+  const ncFiles = onlyExt(files, "nc");
   expect(ncFiles).toHaveLength(3);
 
-  const mcamFiles = onlyExt("mcam")(await getFiles(partB));
+  const mcamFiles = onlyExt(files, "mcam");
   expect(mcamFiles).toHaveLength(1);
 
-  const sldFiles = onlyExt("sldprt")(await getFiles(partB));
+  const sldFiles = onlyExt(files, "sldprt");
   expect(sldFiles).toHaveLength(1);
 
   done();

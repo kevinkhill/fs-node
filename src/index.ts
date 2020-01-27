@@ -1,7 +1,6 @@
 export { cd } from "./cd";
 export { createNode } from "./createNode";
 export { onlyDirs, onlyExt, onlyFiles } from "./filters";
-export { FsNode } from "./FsNode";
 export { getContents } from "./getContents";
 export { getDirs } from "./getDirs";
 export { getFiles } from "./getFiles";
@@ -15,3 +14,14 @@ export {
   hasSetupInfo,
   getSetupInfo
 } from "./setupInfo";
+
+export interface FsNode {
+  name: string;
+  ext?: string;
+  root: string;
+  abspath: string;
+  relpath: string;
+  isRoot: boolean;
+  isFile: boolean;
+  isDirectory: boolean;
+}

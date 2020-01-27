@@ -4,7 +4,7 @@
     "noEmit": true,
     "sourceMap": true,
     "target": "esnext",
-    "declaration": true,
+    // "declaration": true,
     "esModuleInterop": true,
     // "isolatedModules": true,
     "moduleResolution": "node",
@@ -13,5 +13,5 @@
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext"]
   },
-  "include": ["bili.config.js", "src/*.ts"]
+  "include": ["src/*.ts"]
 }

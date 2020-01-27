@@ -1,4 +1,4 @@
-import { FsNode } from "./FsNode";
+import { FsNode } from ".";
 import { ls } from "./ls";
 import { readFile } from "./readFile";
 

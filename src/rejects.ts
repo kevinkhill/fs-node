@@ -1,6 +1,6 @@
 import reject from "lodash/fp/reject";
 
-import { FsNode } from "./FsNode";
+import { FsNode } from ".";
 
 export const noFiles = reject((node: FsNode) => node.isFile);
 

@@ -1,7 +1,11 @@
-import { isImage as npmIsImage } from "is-image";
+import { FsNode } from ".";
 
-import { FsNode } from "./FsNode";
+export const IMG_EXTENSIONS = new Set(["png", "jpg", "bmp", "gif"]);
 
 export function isImage(node: FsNode): boolean {
-  return npmIsImage(node.abspath);
+  if (node.isDirectory) {
+    throw Error("Directories cannot be images.");
+  }
+
+  return IMG_EXTENSIONS.has(node.ext.toLowerCase());
 }

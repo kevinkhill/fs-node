@@ -1,7 +1,7 @@
 import { any, find } from "lodash/fp";
 
+import { FsNode } from ".";
 import { cd } from "./cd";
-import { FsNode } from "./FsNode";
 import { ls } from "./ls";
 
 export const isSetupNode = (node: FsNode): boolean =>

@@ -1,4 +1,4 @@
-import { FsNode } from "./FsNode";
+import { FsNode } from ".";
 import { cd } from "./cd";
 import { onlyFiles } from "./filters";
 import { ls } from "./ls";

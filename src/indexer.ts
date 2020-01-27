@@ -3,7 +3,7 @@ import map from "lodash/fp/map";
 import path from "path";
 import readdirp from "readdirp";
 
-import { FsNode } from "./FsNode";
+import { FsNode } from ".";
 
 /**
  * Scan a node for files and return a list of paths

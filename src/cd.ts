@@ -1,6 +1,6 @@
 import path from "path";
 
-import { FsNode } from "./FsNode";
+import { FsNode } from ".";
 import { createNode } from "./createNode";
 
 /**
