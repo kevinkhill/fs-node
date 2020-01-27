@@ -4,7 +4,7 @@
     "noEmit": true,
     "sourceMap": true,
     "target": "esnext",
-    // "declaration": true,
+    "declaration": true,
     "esModuleInterop": true,
     // "isolatedModules": true,
     "moduleResolution": "node",

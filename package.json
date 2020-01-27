@@ -2,13 +2,14 @@
   "name": "fs-node",
   "version": "1.0.0",
   "private": false,
-  "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git@github.com:kevinkhill/fs-node.git"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
