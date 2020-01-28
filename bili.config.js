@@ -5,11 +5,11 @@ module.exports = {
     format: ["esm", "cjs"]
   },
   plugins: {
-    //   typescript2: {
-    //     tsconfigOverride: {
-    //       include: ["src"]
-    //     }
-    //   }
+    typescript2: {
+      tsconfigOverride: {
+        include: ["src"]
+      }
+    },
     // delete: { targets: "dist/*" }
   }
 };

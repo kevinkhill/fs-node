@@ -13,5 +13,8 @@
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext"]
   },
-  "include": ["src/*.ts"]
+  "include": [
+    "src/*.ts",
+    "tests/*.ts"
+  ]
 }
